@@ -166,21 +166,32 @@ p { margin: 0 0 1rem; }
 }
 
 /* Contact pill: .nav-links a is more specific than .btn-primary, so navy
-   link color was painting over the navy (--green / royal) fill (~1.05:1). */
+   link color was painting over the navy (--green / royal) fill (~1.05:1).
+   Force an explicit light (#fff) label on the navy oval for every link
+   state, including the open phone menu. */
 .nav-links .nav-cta a.btn,
+.nav-links .nav-cta a.btn:link,
+.nav-links .nav-cta a.btn:visited,
 .nav-links .nav-cta a.btn:hover,
+.nav-links .nav-cta a.btn:focus,
 .nav-links .nav-cta a.btn:focus-visible,
-.nav-links .nav-cta a.btn[aria-current="page"] {
-  color: var(--white);
+.nav-links .nav-cta a.btn:active,
+.nav-links .nav-cta a.btn[aria-current="page"],
+.nav-links.is-open .nav-cta a.btn {
+  color: #ffffff;
+  -webkit-text-fill-color: #ffffff;
   background: var(--green);
   border-bottom-color: transparent;
 }
 
 .nav-links .nav-cta a.btn:hover,
+.nav-links .nav-cta a.btn:focus,
 .nav-links .nav-cta a.btn:focus-visible,
+.nav-links .nav-cta a.btn:active,
 .nav-links .nav-cta a.btn[aria-current="page"] {
   background: var(--green-hover);
-  color: var(--white);
+  color: #ffffff;
+  -webkit-text-fill-color: #ffffff;
 }
 
 .nav-toggle {
@@ -1322,11 +1333,29 @@ p { margin: 0 0 1rem; }
 
   /* Keep the navy pill + light label in the phone menu; do not inherit
      the soft-blue highlight used on plain nav links. */
+  .nav-links.is-open .nav-cta a.btn,
+  .nav-links .nav-cta a.btn,
+  .nav-links .nav-cta a.btn:link,
+  .nav-links .nav-cta a.btn:visited,
   .nav-links .nav-cta a.btn:hover,
+  .nav-links .nav-cta a.btn:focus,
   .nav-links .nav-cta a.btn:focus-visible,
+  .nav-links .nav-cta a.btn:active,
+  .nav-links .nav-cta a.btn[aria-current="page"] {
+    color: #ffffff;
+    -webkit-text-fill-color: #ffffff;
+    background: var(--green);
+    border-bottom-color: transparent;
+  }
+
+  .nav-links .nav-cta a.btn:hover,
+  .nav-links .nav-cta a.btn:focus,
+  .nav-links .nav-cta a.btn:focus-visible,
+  .nav-links .nav-cta a.btn:active,
   .nav-links .nav-cta a.btn[aria-current="page"] {
     background: var(--green-hover);
-    color: var(--white);
+    color: #ffffff;
+    -webkit-text-fill-color: #ffffff;
   }
 
   .priority-item {
