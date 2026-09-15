@@ -1,0 +1,3165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Service Desk Feud — Host Controls</title>
+  <style>
+    :root {
+      --navy: #0a1f44;
+      --navy-mid: #123a7a;
+      --gold: #f0c14b;
+      --gold-bright: #ffe08a;
+      --red: #c41e3a;
+      --red-dark: #8b1028;
+      --panel: #0d2a5c;
+      --text: #f5f7fb;
+      --muted: #a8b8d4;
+      --green: #1f9d55;
+      --shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      min-height: 100%;
+      font-family: "Segoe UI", system-ui, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(ellipse at top, #1a4a9c 0%, transparent 55%),
+        linear-gradient(160deg, #061428 0%, var(--navy) 40%, #071833 100%);
+      background-color: var(--navy);
+    }
+
+    body {
+      padding: 1rem;
+    }
+
+    .game-wrap {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    header.game-header {
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+
+    header.game-header h1 {
+      margin: 0;
+      font-size: clamp(1.6rem, 4vw, 2.4rem);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--gold-bright);
+      text-shadow: 0 2px 12px rgba(0, 0, 0, 0.5);
+    }
+
+    header.game-header p {
+      margin: 0.35rem 0 0;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .teams {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      gap: 0.75rem;
+      align-items: stretch;
+      margin-bottom: 1rem;
+    }
+
+    .team {
+      background: var(--panel);
+      border: 2px solid rgba(240, 193, 75, 0.35);
+      border-radius: 14px;
+      padding: 0.85rem 1rem;
+      text-align: center;
+      box-shadow: var(--shadow);
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .team.control {
+      border-color: var(--gold);
+      box-shadow: 0 0 0 3px rgba(240, 193, 75, 0.25), var(--shadow);
+    }
+
+    /* Face-off: who "buzzed in" / raised hand first */
+    .team.buzzed {
+      border-color: #5dff9a;
+      animation: buzz-flash 0.45s ease-in-out infinite alternate;
+      box-shadow:
+        0 0 0 4px rgba(93, 255, 154, 0.45),
+        0 0 40px rgba(93, 255, 154, 0.35),
+        var(--shadow);
+      z-index: 2;
+    }
+
+    .team.buzzed h2 {
+      color: #b8ffd4;
+    }
+
+    .team .buzz-flag {
+      display: none;
+      margin: 0.35rem 0 0;
+      padding: 0.25rem 0.5rem;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #062816;
+      background: linear-gradient(90deg, #5dff9a, #b8ffd4);
+    }
+
+    .team.buzzed .buzz-flag {
+      display: inline-block;
+      animation: buzz-flag-pulse 0.6s ease-in-out infinite alternate;
+    }
+
+    .team.buzz-ready {
+      cursor: pointer;
+    }
+
+    .team.buzz-ready:hover {
+      border-color: rgba(93, 255, 154, 0.65);
+    }
+
+    @keyframes buzz-flash {
+      from {
+        background: #0d2a5c;
+        transform: scale(1);
+      }
+      to {
+        background: #1a5a3a;
+        transform: scale(1.02);
+      }
+    }
+
+    @keyframes buzz-flag-pulse {
+      from { opacity: 0.85; }
+      to { opacity: 1; }
+    }
+
+    .team h2 {
+      margin: 0;
+      font-size: 1rem;
+      color: var(--gold);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .team .score {
+      font-size: clamp(2rem, 5vw, 2.8rem);
+      font-weight: 800;
+      font-variant-numeric: tabular-nums;
+      line-height: 1.1;
+      margin-top: 0.2rem;
+    }
+
+    .player-roster {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.35rem;
+      margin-top: 0.55rem;
+      min-height: 1.7rem;
+    }
+
+    .player-chip {
+      border: 1px solid rgba(240, 193, 75, 0.45);
+      background: rgba(0, 0, 0, 0.28);
+      color: var(--text);
+      border-radius: 999px;
+      padding: 0.22rem 0.65rem;
+      font: inherit;
+      font-size: 0.92rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .player-chip:hover {
+      border-color: var(--gold-bright);
+      color: #fff;
+    }
+
+    .player-chip.up {
+      background: linear-gradient(180deg, #ffe08a, var(--gold));
+      color: #0a1f44;
+      border-color: #fff3c4;
+      box-shadow: 0 0 0 2px rgba(240, 193, 75, 0.55);
+    }
+
+    .team .team-edit-label {
+      display: block;
+      margin-top: 0.45rem;
+      font-size: 0.68rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    .team input.team-name {
+      width: 100%;
+      margin-top: 0.2rem;
+      padding: 0.45rem 0.55rem;
+      border-radius: 8px;
+      border: 1px solid rgba(240, 193, 75, 0.45);
+      background: rgba(0,0,0,0.35);
+      color: var(--text);
+      text-align: center;
+      font: inherit;
+      font-size: 0.98rem;
+      font-weight: 700;
+    }
+
+    .team input.team-name:focus {
+      outline: none;
+      border-color: var(--gold);
+      box-shadow: 0 0 0 2px rgba(240, 193, 75, 0.25);
+    }
+
+    .team input.team-name::placeholder {
+      color: rgba(168, 184, 212, 0.65);
+      font-weight: 500;
+    }
+
+    .round-score {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-width: 110px;
+      background: linear-gradient(180deg, #1e4d9c, #0c2d5a);
+      border: 3px solid var(--gold);
+      border-radius: 16px;
+      padding: 0.6rem 0.85rem;
+      box-shadow: var(--shadow);
+    }
+
+    .round-score span {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--gold);
+    }
+
+    .round-score strong {
+      font-size: 2.2rem;
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* Answer clock — large, visible on shared screen */
+    .game-timer {
+      display: none;
+      text-align: center;
+      margin: 0 0 0.85rem;
+      padding: 0.65rem 1rem 0.85rem;
+      border-radius: 16px;
+      border: 3px solid var(--gold);
+      background: linear-gradient(180deg, #0c2d5a, #061428);
+      box-shadow: var(--shadow);
+    }
+
+    .game-timer.active { display: block; }
+
+    .game-timer .timer-label {
+      margin: 0 0 0.15rem;
+      font-size: clamp(0.8rem, 2vw, 1rem);
+      font-weight: 800;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--gold-bright);
+    }
+
+    .game-timer .timer-digits {
+      margin: 0;
+      font-size: clamp(3rem, 12vw, 5.5rem);
+      font-weight: 900;
+      font-variant-numeric: tabular-nums;
+      line-height: 1;
+      color: #fff;
+      text-shadow: 0 0 28px rgba(240, 193, 75, 0.45);
+    }
+
+    .game-timer.warn {
+      border-color: #ff922b;
+      background: linear-gradient(180deg, #5a3010, #2a1508);
+    }
+
+    .game-timer.warn .timer-digits { color: #ffd8a8; }
+
+    .game-timer.danger,
+    .game-timer.expired {
+      border-color: var(--red);
+      background: linear-gradient(180deg, #5a1020, #2a0810);
+      animation: timer-pulse 0.45s ease-in-out infinite alternate;
+    }
+
+    .game-timer.danger .timer-digits,
+    .game-timer.expired .timer-digits {
+      color: #ff8a9a;
+      text-shadow: 0 0 28px rgba(196, 30, 58, 0.7);
+    }
+
+    .game-timer.expired .timer-label {
+      color: #ff8a9a;
+    }
+
+    @keyframes timer-pulse {
+      from { box-shadow: 0 0 0 0 rgba(196, 30, 58, 0.35); }
+      to { box-shadow: 0 0 0 10px rgba(196, 30, 58, 0.05), 0 0 40px rgba(196, 30, 58, 0.35); }
+    }
+
+    .question-board {
+      background: linear-gradient(180deg, #1450a8, #0a2d6b);
+      border: 4px solid var(--gold);
+      border-radius: 18px;
+      padding: 1rem 1.15rem 1.25rem;
+      box-shadow: var(--shadow);
+      margin-bottom: 1rem;
+    }
+
+    .phase-badge {
+      display: inline-block;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--navy);
+      background: var(--gold);
+      padding: 0.25rem 0.65rem;
+      border-radius: 999px;
+      margin-bottom: 0.65rem;
+    }
+
+    .board-intro {
+      margin: 0 0 0.45rem;
+      font-size: clamp(1rem, 2.2vw, 1.2rem);
+      font-weight: 700;
+      line-height: 1.35;
+      text-align: center;
+      color: var(--gold-bright);
+    }
+
+    .question-text {
+      margin: 0 0 1rem;
+      font-size: clamp(1.15rem, 2.8vw, 1.55rem);
+      font-weight: 700;
+      line-height: 1.35;
+      text-align: center;
+    }
+
+    .answers {
+      display: grid;
+      gap: 0.5rem;
+    }
+
+    .answer-row {
+      display: grid;
+      grid-template-columns: 48px 1fr 72px;
+      gap: 0.5rem;
+      align-items: stretch;
+      min-height: 56px;
+      perspective: 900px;
+    }
+
+    .answer-num,
+    .answer-pts {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 10px;
+      font-weight: 800;
+      border: 2px solid rgba(240, 193, 75, 0.45);
+      background: #082456;
+    }
+
+    .answer-num {
+      font-size: 1.25rem;
+      color: var(--gold-bright);
+    }
+
+    /* 3D flip tile — rotates downward to reveal answer */
+    .answer-face {
+      position: relative;
+      display: block;
+      width: 100%;
+      min-height: 56px;
+      padding: 0;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      user-select: none;
+      perspective: 900px;
+    }
+
+    .answer-face:disabled {
+      cursor: default;
+    }
+
+    .answer-face-inner {
+      position: relative;
+      width: 100%;
+      min-height: 56px;
+      transform-style: preserve-3d;
+      transform: rotateX(0deg);
+      transition: transform 0.7s cubic-bezier(0.4, 0.05, 0.2, 1);
+    }
+
+    /* Open = answer side facing camera (spun downward) */
+    .answer-face.is-open .answer-face-inner {
+      transform: rotateX(-180deg);
+    }
+
+    /* Already revealed on re-render: no spin animation */
+    .answer-face.is-open.no-anim .answer-face-inner {
+      transition: none;
+    }
+
+    .answer-face-front,
+    .answer-face-back {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 10px;
+      font-weight: 800;
+      font-size: clamp(1rem, 2.2vw, 1.25rem);
+      border: 2px solid rgba(240, 193, 75, 0.45);
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+      box-sizing: border-box;
+    }
+
+    .answer-face-front {
+      background: #082456;
+      color: var(--gold-bright);
+    }
+
+    .answer-face:not(.revealed):not(:disabled):hover .answer-face-front {
+      background: #0e3678;
+    }
+
+    .answer-face-front .hidden-label {
+      letter-spacing: 0.2em;
+      opacity: 0.85;
+    }
+
+    .answer-face-back {
+      background: linear-gradient(90deg, #0d3a82, #1a5ab8);
+      border-color: var(--gold);
+      color: #fff;
+      justify-content: flex-start;
+      padding: 0.35rem 1rem;
+      text-align: left;
+      transform: rotateX(180deg);
+    }
+
+    .answer-pts {
+      font-size: 1.2rem;
+      font-variant-numeric: tabular-nums;
+      color: var(--gold-bright);
+      transition: opacity 0.35s ease 0.35s; /* show mid-flip */
+    }
+
+    .answer-pts.dim {
+      opacity: 0.35;
+      transition-delay: 0s;
+    }
+
+    .answer-pts.pop-in {
+      animation: pts-pop 0.4s ease 0.35s both;
+    }
+
+    @keyframes pts-pop {
+      0% { transform: scale(0.6); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    .strikes-panel {
+      display: flex;
+      justify-content: center;
+      gap: 0.75rem;
+      margin: 1rem 0 0.5rem;
+      min-height: 64px;
+      align-items: center;
+    }
+
+    .strike-slot {
+      width: 64px;
+      height: 64px;
+      border-radius: 12px;
+      border: 3px solid rgba(255,255,255,0.2);
+      display: grid;
+      place-items: center;
+      font-size: 2.4rem;
+      font-weight: 900;
+      color: transparent;
+      background: rgba(0,0,0,0.2);
+    }
+
+    .strike-slot.on {
+      color: var(--red);
+      border-color: var(--red);
+      background: rgba(196, 30, 58, 0.15);
+      text-shadow: 0 0 18px rgba(196, 30, 58, 0.8);
+    }
+
+    .strike-slot.on.pop {
+      animation: strike-pop 0.35s ease;
+    }
+
+    @keyframes strike-pop {
+      0% { transform: scale(0.4); opacity: 0; }
+      60% { transform: scale(1.15); }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    .big-x-overlay {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      gap: clamp(0.5rem, 3vw, 2rem);
+      background: rgba(0,0,0,0.6);
+      z-index: 50;
+      pointer-events: none;
+      padding: 1rem;
+    }
+
+    .big-x-overlay.show {
+      display: flex;
+      animation: fade-x 1.35s ease forwards;
+    }
+
+    .big-x-overlay .x-mark {
+      font-weight: 900;
+      color: var(--red);
+      line-height: 1;
+      text-shadow: 0 0 50px rgba(196, 30, 58, 0.95), 0 0 90px rgba(196, 30, 58, 0.55);
+      animation: x-pop 0.45s cubic-bezier(0.18, 0.9, 0.25, 1.15) both;
+    }
+
+    .big-x-overlay.count-1 .x-mark { font-size: min(78vw, 560px); }
+    .big-x-overlay.count-2 .x-mark { font-size: min(46vw, 400px); }
+    .big-x-overlay.count-3 .x-mark { font-size: min(32vw, 320px); }
+    .big-x-overlay .x-mark:nth-child(2) { animation-delay: 0.08s; }
+    .big-x-overlay .x-mark:nth-child(3) { animation-delay: 0.16s; }
+
+    @keyframes fade-x {
+      0% { opacity: 0; }
+      12% { opacity: 1; }
+      72% { opacity: 1; }
+      100% { opacity: 0; }
+    }
+
+    @keyframes x-pop {
+      0% { transform: scale(0.25); opacity: 0; }
+      55% { transform: scale(1.12); opacity: 1; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    .winner-overlay {
+      position: fixed;
+      inset: 0;
+      display: none;
+      place-items: center;
+      background: rgba(0, 0, 0, 0.78);
+      z-index: 60;
+      padding: 1.5rem;
+      cursor: pointer;
+      overflow: hidden;
+    }
+
+    .winner-overlay.show {
+      display: grid;
+      animation: winner-in 0.35s ease-out;
+    }
+
+    /* Round over with leftover answers: keep confetti, leave the board clickable */
+    .winner-overlay.leftovers {
+      background: transparent;
+      place-items: start center;
+      padding-top: 0.6rem;
+      pointer-events: none;
+    }
+    .winner-overlay.leftovers .winner-card {
+      max-width: min(560px, 92vw);
+      padding: 0.7rem 1.1rem 0.85rem;
+      pointer-events: none;
+    }
+    .winner-overlay.leftovers .winner-team {
+      font-size: clamp(1.25rem, 4vw, 1.85rem);
+    }
+    .winner-overlay.leftovers .winner-points,
+    .winner-overlay.leftovers .winner-detail,
+    .winner-overlay.leftovers .winner-hint {
+      font-size: 0.9rem;
+    }
+
+    .winner-overlay #confetti-canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .winner-card {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+      max-width: 720px;
+      width: 100%;
+      padding: 2rem 1.5rem 1.75rem;
+      border-radius: 20px;
+      border: 4px solid var(--gold);
+      background: linear-gradient(165deg, #123a7a 0%, #0a1f44 55%, #061428 100%);
+      box-shadow: 0 0 0 6px rgba(240, 193, 75, 0.2), 0 24px 80px rgba(0, 0, 0, 0.55);
+    }
+
+    .winner-overlay.steal .winner-card,
+    .winner-overlay.clear .winner-card,
+    .winner-overlay.hold.celebrate .winner-card {
+      border-color: #3dd68c;
+      box-shadow: 0 0 0 6px rgba(61, 214, 140, 0.22), 0 24px 80px rgba(0, 0, 0, 0.55);
+    }
+
+    .winner-overlay.hold .winner-card {
+      border-color: var(--gold);
+    }
+
+    .winner-overlay.celebrate .winner-card {
+      max-width: min(920px, 96vw);
+      padding: 2.25rem 1.75rem 2rem;
+      animation: celebrate-card-in 0.55s cubic-bezier(0.18, 0.9, 0.25, 1.15);
+    }
+
+    .winner-kicker {
+      margin: 0 0 0.5rem;
+      font-size: clamp(0.95rem, 2.5vw, 1.15rem);
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .winner-overlay.steal .winner-kicker,
+    .winner-overlay.clear .winner-kicker,
+    .winner-overlay.hold.celebrate .winner-kicker { color: #8ef0bc; }
+    .winner-overlay.hold .winner-kicker { color: var(--gold-bright); }
+
+    .winner-team {
+      margin: 0;
+      font-size: clamp(2rem, 8vw, 3.75rem);
+      font-weight: 900;
+      line-height: 1.1;
+      color: #fff;
+      text-shadow: 0 4px 24px rgba(0, 0, 0, 0.45);
+    }
+
+    .winner-overlay.celebrate .winner-team {
+      font-size: clamp(2.2rem, 9vw, 4.2rem);
+    }
+
+    /* Enlarged team score box front-and-center */
+    .celebrate-team-box {
+      display: none;
+      margin: 1.1rem auto 0.35rem;
+      max-width: 420px;
+      width: 100%;
+      padding: 1.25rem 1.5rem 1.4rem;
+      border-radius: 18px;
+      border: 4px solid var(--gold);
+      background: linear-gradient(180deg, #1a5ab8 0%, #0a2d6b 100%);
+      box-shadow:
+        0 0 0 6px rgba(240, 193, 75, 0.35),
+        0 0 60px rgba(93, 255, 154, 0.35),
+        0 20px 50px rgba(0, 0, 0, 0.45);
+      animation: celebrate-box-pop 0.65s cubic-bezier(0.18, 0.9, 0.25, 1.2);
+    }
+
+    .winner-overlay.celebrate .celebrate-team-box {
+      display: block;
+    }
+
+    .celebrate-team-box .celebrate-label {
+      margin: 0;
+      font-size: 0.85rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--gold-bright);
+      font-weight: 800;
+    }
+
+    .celebrate-team-box .celebrate-name {
+      margin: 0.35rem 0 0.15rem;
+      font-size: clamp(1.4rem, 4.5vw, 2.1rem);
+      font-weight: 900;
+      color: #fff;
+      line-height: 1.15;
+      text-transform: uppercase;
+    }
+
+    .celebrate-team-box .celebrate-score {
+      margin: 0.2rem 0 0;
+      font-size: clamp(2.8rem, 10vw, 4.5rem);
+      font-weight: 900;
+      font-variant-numeric: tabular-nums;
+      color: var(--gold-bright);
+      line-height: 1;
+      text-shadow: 0 0 24px rgba(240, 193, 75, 0.55);
+    }
+
+    .winner-points {
+      margin: 0.85rem 0 0.35rem;
+      font-size: clamp(1.6rem, 5vw, 2.4rem);
+      font-weight: 800;
+      color: var(--gold-bright);
+    }
+
+    .winner-detail {
+      margin: 0.35rem 0 0;
+      font-size: clamp(1rem, 2.8vw, 1.25rem);
+      color: var(--text);
+      opacity: 0.95;
+    }
+
+    .winner-hint {
+      margin: 1.1rem 0 0;
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+
+    @keyframes winner-in {
+      0% { opacity: 0; }
+      100% { opacity: 1; }
+    }
+
+    @keyframes celebrate-card-in {
+      0% { opacity: 0; transform: scale(0.72) translateY(30px); }
+      100% { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    @keyframes celebrate-box-pop {
+      0% { opacity: 0; transform: scale(0.4); }
+      60% { transform: scale(1.08); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+
+    .status-bar {
+      text-align: center;
+      color: var(--gold-bright);
+      font-weight: 600;
+      min-height: 1.5em;
+      margin-bottom: 0.75rem;
+    }
+
+    .host-panel {
+      background: rgba(0, 0, 0, 0.35);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 14px;
+      padding: 1rem;
+      margin-top: 0.5rem;
+    }
+
+    .host-panel h3 {
+      margin: 0 0 0.75rem;
+      font-size: 0.95rem;
+      color: var(--gold);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .host-next-prompt {
+      margin: 0 0 0.75rem;
+      font-size: clamp(1.05rem, 2.4vw, 1.3rem);
+      font-weight: 700;
+      line-height: 1.35;
+      color: var(--gold-bright);
+    }
+
+    .host-next-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.65rem;
+      margin-bottom: 0.35rem;
+    }
+
+    .host-panel button.host-next-lg {
+      flex: 1 1 220px;
+      min-height: 56px;
+      font-size: 1.08rem;
+      padding: 0.75rem 1rem;
+    }
+
+    .host-more {
+      margin-top: 0.85rem;
+    }
+
+    .host-more summary {
+      cursor: pointer;
+      color: var(--muted);
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    .host-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .host-panel button,
+    .host-panel select {
+      font: inherit;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.2);
+      padding: 0.55rem 0.85rem;
+      cursor: pointer;
+      background: #123a7a;
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    .host-panel button:hover {
+      background: #1a4d9e;
+    }
+
+    .host-panel button.danger {
+      background: var(--red-dark);
+      border-color: var(--red);
+    }
+
+    .host-panel button.danger:hover {
+      background: var(--red);
+    }
+
+    .host-panel button.gold {
+      background: var(--gold);
+      color: var(--navy);
+      border-color: var(--gold-bright);
+    }
+
+    .host-panel button.gold:hover {
+      background: var(--gold-bright);
+    }
+
+    .host-panel button:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .host-help {
+      margin: 0.5rem 0 0;
+      font-size: 0.82rem;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+
+    .host-help kbd {
+      display: inline-block;
+      padding: 0.05rem 0.35rem;
+      border-radius: 4px;
+      border: 1px solid rgba(255,255,255,0.25);
+      background: rgba(0,0,0,0.3);
+      font-size: 0.78rem;
+    }
+
+    .answer-key {
+      background: rgba(0, 0, 0, 0.45);
+      border: 2px solid rgba(240, 193, 75, 0.4);
+      border-radius: 14px;
+      padding: 0.85rem 1rem 1rem;
+      margin-top: 0.85rem;
+    }
+
+    .answer-key h3 {
+      margin: 0 0 0.25rem;
+      font-size: 1rem;
+      color: var(--gold-bright);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .answer-key .key-help {
+      margin: 0 0 0.75rem;
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+
+    .answer-key-list {
+      display: grid;
+      gap: 0.4rem;
+    }
+
+    .answer-key-row {
+      display: grid;
+      grid-template-columns: 48px 1fr 56px auto;
+      gap: 0.5rem;
+      align-items: center;
+      padding: 0.45rem 0.55rem;
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(8, 36, 86, 0.75);
+      cursor: pointer;
+      text-align: left;
+      color: inherit;
+      font: inherit;
+      width: 100%;
+      transition: border-color 0.15s, background 0.15s;
+    }
+
+    .answer-key-row:hover:not(.revealed):not(:disabled) {
+      border-color: var(--gold);
+      background: rgba(20, 70, 140, 0.85);
+    }
+
+    .answer-key-row.revealed {
+      opacity: 0.55;
+      cursor: default;
+      border-color: rgba(61, 214, 140, 0.35);
+      background: rgba(12, 50, 40, 0.45);
+    }
+
+    .answer-key-row .key-num {
+      font-weight: 900;
+      font-size: 1.15rem;
+      color: var(--gold-bright);
+      text-align: center;
+    }
+
+    .answer-key-row .key-text {
+      font-weight: 700;
+      font-size: 1rem;
+    }
+
+    .answer-key-row .key-pts {
+      font-weight: 800;
+      font-variant-numeric: tabular-nums;
+      color: var(--gold);
+      text-align: right;
+    }
+
+    .answer-key-row .key-state {
+      font-size: 0.72rem;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 0.2rem 0.45rem;
+      border-radius: 999px;
+      white-space: nowrap;
+    }
+
+    .answer-key-row .key-state.hidden-state {
+      color: #062816;
+      background: var(--gold);
+    }
+
+    .answer-key-row .key-state.shown-state {
+      color: #8ef0bc;
+      background: rgba(61, 214, 140, 0.18);
+    }
+
+    .answer-key-empty {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .config-panel {
+      margin-top: 1rem;
+      background: rgba(0,0,0,0.28);
+      border: 1px dashed rgba(255,255,255,0.2);
+      border-radius: 12px;
+      padding: 0.85rem 1rem;
+    }
+
+    .config-panel summary {
+      cursor: pointer;
+      font-weight: 700;
+      color: var(--gold);
+    }
+
+    .config-panel textarea {
+      width: 100%;
+      min-height: 180px;
+      margin-top: 0.75rem;
+      padding: 0.75rem;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.15);
+      background: #061428;
+      color: var(--text);
+      font-family: ui-monospace, Consolas, monospace;
+      font-size: 0.85rem;
+      line-height: 1.4;
+    }
+
+    .config-panel .config-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-top: 0.6rem;
+    }
+
+    @media (max-width: 700px) {
+      .teams {
+        grid-template-columns: 1fr;
+      }
+      .answer-row {
+        grid-template-columns: 40px 1fr 56px;
+      }
+    }
+
+    /* Hide host controls when projecting (press H) */
+    body.audience-mode .host-panel,
+    body.audience-mode .config-panel,
+    body.audience-mode .answer-key,
+    body.audience-mode .team input.team-name,
+    body.audience-mode .team .team-edit-label {
+      display: none !important;
+    }
+  </style>
+</head>
+<body>
+  <div class="game-wrap">
+    <header class="game-header">
+      <h1>Service Desk Feud — Host</h1>
+      <p>
+        Controls only · Share the <strong>audience board</strong> in Teams (not this page).
+        <strong>All game sound plays on the audience board</strong> — include computer/tab audio when sharing.
+      </p>
+      <p style="margin-top:0.55rem">
+        <button type="button" class="gold" id="btn-open-display">Open audience board</button>
+        <a href="family-feud.html" target="_blank" rel="noopener" style="color:var(--gold-bright);font-weight:700;margin-left:0.75rem">or open family-feud.html</a>
+      </p>
+      <p id="sync-status" style="margin-top:0.4rem;color:#8ef0bc;font-weight:700;font-size:0.9rem">
+        Publishing to audience board… (audio plays there)
+      </p>
+    </header>
+
+    <div class="teams">
+      <div class="team" id="team0-panel" data-team="0" title="During face-off: click if this captain buzzed / raised hand first">
+        <h2 id="label0">Team 1</h2>
+        <div class="score" id="score0">0</div>
+        <div class="buzz-flag" id="buzz-flag0">Answering now</div>
+        <div class="player-roster" id="roster0"></div>
+        <label class="team-edit-label" for="name0">Players (first names)</label>
+        <input class="team-name" id="name0" type="text" value=""
+          placeholder="Mark, Tom, Joe" maxlength="240" autocomplete="off"
+          aria-label="Team 1 player first names" />
+      </div>
+      <div class="round-score">
+        <span>Round</span>
+        <strong id="round-points">0</strong>
+      </div>
+      <div class="team" id="team1-panel" data-team="1" title="During face-off: click if this captain buzzed / raised hand first">
+        <h2 id="label1">Team 2</h2>
+        <div class="score" id="score1">0</div>
+        <div class="buzz-flag" id="buzz-flag1">Answering now</div>
+        <div class="player-roster" id="roster1"></div>
+        <label class="team-edit-label" for="name1">Players (first names)</label>
+        <input class="team-name" id="name1" type="text" value=""
+          placeholder="Sarah, Chris, Pat" maxlength="240" autocomplete="off"
+          aria-label="Team 2 player first names" />
+      </div>
+    </div>
+
+    <p class="status-bar" id="status">Load a round, then start Face-Off.</p>
+
+    <div class="game-timer" id="game-timer" aria-live="polite">
+      <p class="timer-label" id="timer-label">Timer</p>
+      <p class="timer-digits" id="timer-digits">0:00</p>
+    </div>
+
+    <div class="question-board">
+      <div class="phase-badge" id="phase-badge">Face-Off</div>
+      <p class="board-intro" id="board-intro">The top 6 answers are on the board. We asked 100 people…</p>
+      <p class="question-text" id="question">We surveyed 100 people. Top answers are on the board…</p>
+      <div class="answers" id="answers"></div>
+      <div class="strikes-panel" id="strikes" aria-label="Strikes">
+        <div class="strike-slot" data-strike="0">✖</div>
+        <div class="strike-slot" data-strike="1">✖</div>
+        <div class="strike-slot" data-strike="2">✖</div>
+      </div>
+    </div>
+
+    <div class="host-panel" id="host-panel">
+      <h3>Do this next</h3>
+      <p class="host-next-prompt" id="host-next-prompt">Load a round, then start Face-Off.</p>
+      <div class="host-next-actions" id="host-next-actions"></div>
+      <p class="host-help">
+        Click the <strong>first name</strong> who is answering so everyone sees who is up.
+        Flip a correct answer in the <strong>answer key</strong> below.
+        <kbd>Q</kbd>/<kbd>P</kbd> which team ·
+        <kbd>X</kbd> or <kbd>Space</kbd> wrong ·
+        <kbd>1</kbd>–<kbd>8</kbd> flip that number.
+      </p>
+      <details class="host-more">
+        <summary>All controls (overrides)</summary>
+        <div class="host-row" style="margin-top:0.65rem">
+          <button type="button" class="gold" id="btn-faceoff">Start Face-Off</button>
+          <button type="button" id="btn-buzz0">Q · Team 1 buzzed first</button>
+          <button type="button" id="btn-buzz1">P · Team 2 buzzed first</button>
+          <button type="button" id="btn-clear-buzz">Clear buzz</button>
+        </div>
+        <div class="host-row">
+          <button type="button" id="btn-give0">Team 1 wins face-off</button>
+          <button type="button" id="btn-give1">Team 2 wins face-off</button>
+        </div>
+        <p class="host-help" style="margin:0.35rem 0 0">
+          <strong>Timers:</strong> face-off = <strong>10s</strong>; main play &amp; steal = <strong>30s</strong> (resets after flip/Wrong).
+          Host judges timeout → <strong>Wrong</strong>.
+        </p>
+        <div class="host-row">
+          <button type="button" class="danger" id="btn-wrong">Wrong / Strike (X + buzzer)</button>
+          <button type="button" id="btn-pass-faceoff">Pass (other team answering)</button>
+          <button type="button" id="btn-clear-strikes">Clear strikes</button>
+          <button type="button" id="btn-steal">Start steal chance</button>
+        </div>
+        <div class="host-row">
+          <label>
+            Reveal #
+            <select id="reveal-select"></select>
+          </label>
+          <button type="button" class="gold" id="btn-reveal">Flip answer (bell)</button>
+          <button type="button" id="btn-bank">Bank round points to control team</button>
+          <button type="button" id="btn-next">Next round</button>
+          <button type="button" id="btn-reset-scores">Reset all scores</button>
+        </div>
+      </details>
+    </div>
+
+    <div class="answer-key" id="answer-key" aria-label="Host answer key">
+      <h3>Answer key (host only)</h3>
+      <p class="key-help">
+        All correct answers with board numbers — not shown on the audience board.
+        Click a row (or press that number key) to flip it when someone is right.
+        After the round ends you can still flip leftover answers for the audience — no extra points or music.
+      </p>
+      <div class="answer-key-list" id="answer-key-list"></div>
+    </div>
+
+    <details class="config-panel" id="config-panel">
+      <summary>Edit questions &amp; answers (host)</summary>
+      <p class="host-help" style="margin-top:0.5rem">
+        Format: first line is the question. Then one answer per line as
+        <code>Answer text | points</code>. Points should add up to 100. Use a blank line, then the next question for multiple rounds.
+        This browser remembers the last questions you entered — open this same host page on game day.
+      </p>
+      <textarea id="round-editor" spellcheck="false"></textarea>
+      <div class="config-actions">
+        <button type="button" class="gold" id="btn-apply-rounds">Apply &amp; load round 1</button>
+        <button type="button" id="btn-sample">Restore sample rounds</button>
+      </div>
+    </details>
+  </div>
+
+  <div class="big-x-overlay count-1" id="big-x" aria-hidden="true">
+    <div class="x-mark">✖</div>
+  </div>
+
+  <div class="winner-overlay" id="winner-overlay" aria-hidden="true" role="dialog" aria-labelledby="winner-team">
+    <!-- No confetti canvas on host — celebration audio/visual is on audience board only -->
+    <div class="winner-card">
+      <p class="winner-kicker" id="winner-kicker">Round winner</p>
+      <p class="winner-team" id="winner-team">Team</p>
+      <p class="winner-points" id="winner-points">+0 points</p>
+      <p class="winner-detail" id="winner-detail"></p>
+      <p class="winner-hint">Celebration (confetti + music) plays on the audience board</p>
+    </div>
+  </div>
+
+  <script src="js/family-feud-sync.js"></script>
+  <!-- Confetti only on audience board (family-feud.html) — do not load here -->
+  <script>
+(function () {
+  "use strict";
+
+  /* ========== SAMPLE ROUNDS (edit via host panel) ========== */
+  const SAMPLE_TEXT = [
+    "Name something people do when the Wi-Fi goes out.",
+    "Restart the router | 32",
+    "Use phone hotspot | 24",
+    "Complain | 18",
+    "Read a book | 12",
+    "Go outside | 8",
+    "Take a nap | 6",
+    "",
+    "Name a reason someone might be late to a meeting.",
+    "Traffic | 30",
+    "Overslept | 22",
+    "Lost track of time | 16",
+    "Kids / daycare | 14",
+    "Tech issues | 10",
+    "Wrong meeting link | 8",
+  ].join("\n");
+
+  /* ========== AUDIO ==========
+     Local SFX in sounds/ (ding, buzzer, face-off theme).
+     Fall back to Web Audio synth if files are missing / blocked. */
+  let audioCtx = null;
+  let audioUnlocked = false;
+  const sampleBell = new Audio("sounds/bell.mp3?v=ff-yes");
+  const sampleBuzzer = new Audio("sounds/buzzer.mp3?v=ff-no");
+  const sampleFaceOff = new Audio("sounds/faceoff-theme.mp3?v=2");
+  const samplePlayerMode = new Audio("sounds/player-mode.mp3?v=1");
+  sampleBell.preload = "auto";
+  sampleBuzzer.preload = "auto";
+  sampleFaceOff.preload = "auto";
+  samplePlayerMode.preload = "auto";
+  sampleBell.volume = 0.9;
+  sampleBuzzer.volume = 0.9;
+  sampleFaceOff.volume = 0.85;
+  samplePlayerMode.volume = 0.9;
+
+  function unlockAudio() {
+    if (audioUnlocked) return;
+    audioUnlocked = true;
+    // Browsers require a user gesture before sound plays
+    try {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioCtx.state === "suspended") audioCtx.resume();
+    } catch (e) { /* ignore */ }
+    // Prime HTMLAudio elements so later plays are instant
+    [sampleBell, sampleBuzzer, sampleFaceOff, samplePlayerMode].forEach(function (a) {
+      try {
+        a.muted = true;
+        const p = a.play();
+        if (p && p.then) {
+          p.then(function () {
+            a.pause();
+            a.currentTime = 0;
+            a.muted = false;
+          }).catch(function () {
+            a.muted = false;
+          });
+        } else {
+          a.muted = false;
+        }
+      } catch (e) {
+        a.muted = false;
+      }
+    });
+  }
+  document.addEventListener("pointerdown", unlockAudio, { once: true });
+  document.addEventListener("keydown", unlockAudio, { once: true });
+
+  function ctx() {
+    if (!audioCtx) {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    if (audioCtx.state === "suspended") audioCtx.resume();
+    return audioCtx;
+  }
+
+  function playSample(audioEl, fallbackFn) {
+    unlockAudio();
+    try {
+      audioEl.pause();
+      audioEl.currentTime = 0;
+      const p = audioEl.play();
+      if (p && p.then) {
+        p.catch(function () {
+          fallbackFn();
+        });
+      }
+    } catch (e) {
+      fallbackFn();
+    }
+  }
+
+  function synthBell() {
+    const c = ctx();
+    const now = c.currentTime;
+    // Bright multi-tone ding similar to a survey board reveal
+    [1046.5, 1318.5, 1568].forEach(function (freq, i) {
+      const o = c.createOscillator();
+      const g = c.createGain();
+      o.type = "sine";
+      o.frequency.value = freq;
+      g.gain.setValueAtTime(0.0001, now);
+      g.gain.exponentialRampToValueAtTime(0.32 / (i + 1), now + 0.015 + i * 0.015);
+      g.gain.exponentialRampToValueAtTime(0.0001, now + 0.55 + i * 0.08);
+      o.connect(g);
+      g.connect(c.destination);
+      o.start(now + i * 0.025);
+      o.stop(now + 0.7 + i * 0.1);
+    });
+  }
+
+  function synthBuzzer() {
+    const c = ctx();
+    const now = c.currentTime;
+    const o = c.createOscillator();
+    const o2 = c.createOscillator();
+    const g = c.createGain();
+    o.type = "sawtooth";
+    o2.type = "square";
+    o.frequency.setValueAtTime(120, now);
+    o.frequency.linearRampToValueAtTime(55, now + 0.7);
+    o2.frequency.setValueAtTime(80, now);
+    o2.frequency.linearRampToValueAtTime(40, now + 0.7);
+    g.gain.setValueAtTime(0.0001, now);
+    g.gain.exponentialRampToValueAtTime(0.38, now + 0.02);
+    g.gain.exponentialRampToValueAtTime(0.0001, now + 0.85);
+    o.connect(g);
+    o2.connect(g);
+    g.connect(c.destination);
+    o.start(now);
+    o2.start(now);
+    o.stop(now + 0.9);
+    o2.stop(now + 0.9);
+  }
+
+  function noteFx(partial) {
+    fxId += 1;
+    lastFx = {
+      id: fxId,
+      sound: partial && partial.sound ? partial.sound : null,
+      themeMs: partial && typeof partial.themeMs === "number" ? partial.themeMs : null,
+      bigX: !!(partial && partial.bigX),
+      bigXCount: partial && typeof partial.bigXCount === "number" ? partial.bigXCount : null,
+      winner: (partial && partial.winner) || null,
+      hideWinner: !!(partial && partial.hideWinner),
+      flipIndex: typeof (partial && partial.flipIndex) === "number" ? partial.flipIndex : null,
+    };
+  }
+
+  const FACEOFF_THEME_START_MS = 5000;
+  const CELEBRATE_THEME_MS = 10000;
+
+  /**
+   * ALL game audio plays on the audience board only (family-feud.html).
+   * Host only broadcasts the event so Teams hears sound from the shared window.
+   */
+  function emitSound(partial) {
+    noteFx(partial || {});
+    publishToDisplay();
+  }
+
+  function playBell(extra) {
+    emitSound(Object.assign({ sound: "bell" }, extra || {}));
+  }
+
+  function playBuzzer() {
+    emitSound({ sound: "buzzer" });
+  }
+
+  /** Face-off intro / win theme — audience board plays for durationMs */
+  function playFaceOffTheme(durationMs) {
+    durationMs = typeof durationMs === "number" ? durationMs : FACEOFF_THEME_START_MS;
+    emitSound({ sound: "faceoff", themeMs: durationMs });
+  }
+
+  function stopFaceOffTheme() {
+    // Host does not play audio; stop is sent with hideWinner / explicit noteFx
+  }
+
+  /** First hand-raise / buzz-in sting */
+  function playPlayerMode() {
+    emitSound({ sound: "playermode" });
+  }
+
+  /** Short lock-in when face-off turn passes to the other team */
+  function playBuzzIn() {
+    emitSound({ sound: "buzzin" });
+  }
+
+  /* ========== STATE ========== */
+  let rounds = [];
+  let roundIndex = 0;
+  let answers = []; // { text, points, revealed }
+  let scores = [0, 0];
+  let roundPoints = 0;
+  let strikes = 0;
+  let controlTeam = null; // 0 or 1
+  let phase = "idle"; // idle | faceoff | choosemode | play | steal | done
+  let buzzTeam = null; // 0 or 1 — who is currently answering (flashing)
+  let activePlayer = [null, null]; // roster index currently answering on each team
+  // Face-off duel state (real-show style: 2nd team keeps flash if they beat 1st)
+  let faceOffOpener = null; // team that buzzed first
+  let faceOffAttempt = 0; // 0 = first responder, 1 = second team's try
+  let faceOffBestPts = null; // points of first valid face-off answer (null if miss)
+  let faceOffBestTeam = null; // who currently has the better face-off answer
+
+  // Answer clocks: face-off = 10s, main play / steal = 30s (host judges timeout → Wrong)
+  const TIMER_FACEOFF_SEC = 10;
+  const TIMER_PLAY_SEC = 30;
+  let timerEndsAt = 0; // epoch ms; 0 = inactive
+  let timerDurationSec = 0;
+  let timerLabel = "";
+  let timerTickId = null;
+  let timerExpiredNotified = false;
+
+  const el = {
+    question: document.getElementById("question"),
+    boardIntro: document.getElementById("board-intro"),
+    answers: document.getElementById("answers"),
+    status: document.getElementById("status"),
+    phase: document.getElementById("phase-badge"),
+    gameTimer: document.getElementById("game-timer"),
+    timerLabel: document.getElementById("timer-label"),
+    timerDigits: document.getElementById("timer-digits"),
+    roundPoints: document.getElementById("round-points"),
+    score0: document.getElementById("score0"),
+    score1: document.getElementById("score1"),
+    team0: document.getElementById("team0-panel"),
+    team1: document.getElementById("team1-panel"),
+    strikes: document.getElementById("strikes"),
+    bigX: document.getElementById("big-x"),
+    winnerOverlay: document.getElementById("winner-overlay"),
+    winnerKicker: document.getElementById("winner-kicker"),
+    winnerTeam: document.getElementById("winner-team"),
+    winnerPoints: document.getElementById("winner-points"),
+    winnerDetail: document.getElementById("winner-detail"),
+    revealSelect: document.getElementById("reveal-select"),
+    answerKeyList: document.getElementById("answer-key-list"),
+    editor: document.getElementById("round-editor"),
+    name0: document.getElementById("name0"),
+    name1: document.getElementById("name1"),
+    roster0: document.getElementById("roster0"),
+    roster1: document.getElementById("roster1"),
+    label0: document.getElementById("label0"),
+    label1: document.getElementById("label1"),
+    btnGive0: document.getElementById("btn-give0"),
+    btnGive1: document.getElementById("btn-give1"),
+    btnBuzz0: document.getElementById("btn-buzz0"),
+    btnBuzz1: document.getElementById("btn-buzz1"),
+    hostNextPrompt: document.getElementById("host-next-prompt"),
+    hostNextActions: document.getElementById("host-next-actions"),
+  };
+
+  let winnerHideTimer = null;
+  let celebrateToken = 0;
+  const TEAM_NAME_KEY = "familyFeudTeamNames";
+  const ROUNDS_TEXT_KEY = "familyFeudRoundsText_v1";
+
+  /* Live sync → audience board (family-feud.html) */
+  let syncRev = 0;
+  let fxId = 0;
+  let lastFx = { id: 0, sound: null, bigX: false, winner: null, hideWinner: false };
+  const syncBus = window.FamilyFeudSync
+    ? window.FamilyFeudSync.createBus(function () { /* host is publisher */ }, { isHost: true })
+    : null;
+  let displayWin = null;
+
+  function publishToDisplay() {
+    if (!syncBus) {
+      const s = document.getElementById("sync-status");
+      if (s) {
+        s.textContent = "Sync missing — upload js/family-feud-sync.js";
+        s.style.color = "#ff8a8a";
+      }
+      return;
+    }
+    syncRev += 1;
+    const phaseLabel = el.phase ? el.phase.textContent : phase;
+    const statusText = el.status ? el.status.textContent : "";
+    const q = rounds[roundIndex]
+      ? rounds[roundIndex].question
+      : (el.question ? el.question.textContent : "");
+    const intro = boardIntroLine(answers.length);
+    if (displayWin && !displayWin.closed) {
+      syncBus.attachWindow(displayWin);
+    }
+    syncBus.publish({
+      rev: syncRev,
+      role: "host",
+      phase: phase,
+      phaseLabel: phaseLabel,
+      status: statusText,
+      scores: [scores[0], scores[1]],
+      roundPoints: roundPoints,
+      strikes: strikes,
+      controlTeam: controlTeam,
+      highlightTeam: highlightTeam(),
+      buzzTeam: buzzTeam,
+      names: [teamLabel(0), teamLabel(1)],
+      rosters: [rosterFor(0), rosterFor(1)],
+      activePlayer: [activePlayer[0], activePlayer[1]],
+      boardIntro: intro,
+      question: q,
+      answers: answers.map(function (a) {
+        return { text: a.text, points: a.points, revealed: !!a.revealed };
+      }),
+      timer: {
+        endsAt: timerEndsAt,
+        durationSec: timerDurationSec,
+        label: timerLabel,
+        active: timerEndsAt > 0,
+      },
+      fx: lastFx,
+    });
+    const s = document.getElementById("sync-status");
+    if (s) {
+      s.textContent = "Live → audience board (rev " + syncRev + ")";
+      s.style.color = "#8ef0bc";
+    }
+  }
+
+  function teamLabel(i) {
+    return "Team " + (i + 1);
+  }
+
+  function parseRoster(raw) {
+    const parts = String(raw || "")
+      .split(/[·•,;|/]+|\n/)
+      .map(function (s) { return s.trim(); })
+      .filter(Boolean);
+    if (parts.length === 1 && /^team\s*[12]$/i.test(parts[0])) return [];
+    return parts;
+  }
+
+  function rosterFor(team) {
+    return parseRoster(team === 0 ? el.name0.value : el.name1.value);
+  }
+
+  function playerName(team, index) {
+    const r = rosterFor(team);
+    if (index == null || index < 0 || index >= r.length) return "";
+    return r[index];
+  }
+
+  function answeringName(team) {
+    return playerName(team, activePlayer[team]) || teamLabel(team);
+  }
+
+  function setActivePlayer(team, index, opts) {
+    opts = opts || {};
+    if (team !== 0 && team !== 1) return;
+    activePlayer[team] = index;
+    if (opts.onlyThis) {
+      const other = otherTeam(team);
+      activePlayer[other] = null;
+    }
+    renderRosters();
+    publishToDisplay();
+  }
+
+  function clearActivePlayers() {
+    activePlayer[0] = null;
+    activePlayer[1] = null;
+    renderRosters();
+    publishToDisplay();
+  }
+
+  function advanceActivePlayer(team) {
+    if (team !== 0 && team !== 1) return;
+    const r = rosterFor(team);
+    if (!r.length) return;
+    const i = activePlayer[team];
+    activePlayer[team] = i == null ? 0 : (i + 1) % r.length;
+    renderRosters();
+    publishToDisplay();
+  }
+
+  function renderRosters() {
+    [0, 1].forEach(function (team) {
+      const box = team === 0 ? el.roster0 : el.roster1;
+      if (!box) return;
+      box.innerHTML = "";
+      const r = rosterFor(team);
+      r.forEach(function (name, index) {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "player-chip" + (activePlayer[team] === index ? " up" : "");
+        btn.textContent = name;
+        btn.title = "Click if " + name + " is answering";
+        btn.addEventListener("click", function (ev) {
+          ev.preventDefault();
+          ev.stopPropagation();
+          selectPlayer(team, index);
+        });
+        box.appendChild(btn);
+      });
+    });
+  }
+
+  function selectPlayer(team, index) {
+    if (team !== 0 && team !== 1) return;
+    const r = rosterFor(team);
+    if (index < 0 || index >= r.length) return;
+    const who = r[index];
+
+    if (phase === "idle" || phase === "faceoff") {
+      if (buzzTeam !== team) {
+        if (buzzTeam === null) {
+          registerBuzz(team);
+        } else {
+          passFaceOffTurn(answeringName(buzzTeam) + " passes.", {
+            keepAttempt: false,
+            transferEdge: true,
+          });
+        }
+      }
+      setActivePlayer(team, index, { onlyThis: true });
+      setStatus(who + " is answering.");
+      return;
+    }
+
+    if (phase === "choosemode") {
+      setActivePlayer(team, index, { onlyThis: true });
+      setStatus(who + " is ready if that team plays.");
+      return;
+    }
+
+    if (phase === "play") {
+      if (controlTeam !== team && (controlTeam === 0 || controlTeam === 1)) {
+        const from = controlTeam;
+        controlTeam = team;
+        faceOffBestTeam = team;
+        buzzTeam = null;
+        applyBuzzVisual();
+        setPhase("play", "Main play — " + teamLabel(team));
+        startAnswerTimer(
+          TIMER_PLAY_SEC,
+          "Main play — " + teamLabel(team) + " (" + TIMER_PLAY_SEC + "s)"
+        );
+        setStatus(
+          teamLabel(from) + " passes. " + who + " answers."
+        );
+      } else {
+        setStatus(who + " is answering.");
+      }
+      setActivePlayer(team, index, { onlyThis: true });
+      renderScores();
+      return;
+    }
+
+    if (phase === "steal") {
+      const stealer = (controlTeam === 0 || controlTeam === 1) ? otherTeam(controlTeam) : team;
+      if (team !== stealer) {
+        setStatus("Steal is " + teamLabel(stealer) + "'s chance. Click a name on that team.");
+        return;
+      }
+      setActivePlayer(team, index, { onlyThis: true });
+      setStatus(who + " answers the steal.");
+      return;
+    }
+
+    setActivePlayer(team, index, { onlyThis: true });
+  }
+
+  function formatTimer(sec) {
+    sec = Math.max(0, Math.ceil(sec));
+    var m = Math.floor(sec / 60);
+    var s = sec % 60;
+    return m + ":" + (s < 10 ? "0" : "") + s;
+  }
+
+  function stopAnswerTimer() {
+    timerEndsAt = 0;
+    timerDurationSec = 0;
+    timerLabel = "";
+    timerExpiredNotified = false;
+    if (timerTickId) {
+      window.clearInterval(timerTickId);
+      timerTickId = null;
+    }
+    if (el.gameTimer) {
+      el.gameTimer.classList.remove("active", "warn", "danger", "expired");
+    }
+    if (el.timerDigits) el.timerDigits.textContent = "0:00";
+    if (el.timerLabel) el.timerLabel.textContent = "Timer";
+    // Push inactive timer so the audience board hides the clock
+    try { publishToDisplay(); } catch (e) { /* ignore if called before bus ready */ }
+  }
+
+  function paintAnswerTimer() {
+    if (!el.gameTimer || !timerEndsAt) {
+      if (el.gameTimer) el.gameTimer.classList.remove("active", "warn", "danger", "expired");
+      return;
+    }
+    var leftMs = timerEndsAt - Date.now();
+    var leftSec = leftMs / 1000;
+    var displaySec = Math.max(0, Math.ceil(leftSec));
+    el.gameTimer.classList.add("active");
+    el.gameTimer.classList.remove("warn", "danger", "expired");
+    if (el.timerLabel) el.timerLabel.textContent = timerLabel || "Time to answer";
+    if (el.timerDigits) el.timerDigits.textContent = formatTimer(displaySec);
+
+    if (leftMs <= 0) {
+      el.gameTimer.classList.add("expired");
+      if (el.timerDigits) el.timerDigits.textContent = "0:00";
+      if (el.timerLabel) el.timerLabel.textContent = (timerLabel || "Time") + " — TIME UP";
+      if (!timerExpiredNotified) {
+        timerExpiredNotified = true;
+        // Host judges: press Wrong if they didn't answer in time
+        setStatus(
+          "TIME UP! Host: press Wrong / Strike if they did not answer in time " +
+          "(or flip if they got it just in time)."
+        );
+        publishToDisplay();
+      }
+      return;
+    }
+    // Urgency bands (based on original duration)
+    var ratio = leftSec / Math.max(1, timerDurationSec);
+    if (ratio <= 0.2 || leftSec <= 3) el.gameTimer.classList.add("danger");
+    else if (ratio <= 0.4 || leftSec <= 5) el.gameTimer.classList.add("warn");
+  }
+
+  /**
+   * Start/restart the answer clock. Face-off uses 10s; main play & steal use 30s.
+   * Does not auto-strike — host presses Wrong if time expired without an answer.
+   */
+  function startAnswerTimer(seconds, label) {
+    timerDurationSec = seconds;
+    timerLabel = label || "Time to answer";
+    timerEndsAt = Date.now() + seconds * 1000;
+    timerExpiredNotified = false;
+    if (timerTickId) window.clearInterval(timerTickId);
+    paintAnswerTimer();
+    publishToDisplay();
+    timerTickId = window.setInterval(function () {
+      paintAnswerTimer();
+      // Keep audience board in sync ~every second without spamming every paint
+      if (timerEndsAt) publishToDisplay();
+      if (timerEndsAt && Date.now() >= timerEndsAt + 500) {
+        // Keep showing expired state; stop interval churn after a bit
+        if (timerTickId) {
+          window.clearInterval(timerTickId);
+          timerTickId = null;
+        }
+        paintAnswerTimer();
+        publishToDisplay();
+      }
+    }, 250);
+  }
+
+  function saveTeamNames() {
+    try {
+      localStorage.setItem(TEAM_NAME_KEY, JSON.stringify({
+        name0: el.name0.value.trim(),
+        name1: el.name1.value.trim(),
+      }));
+    } catch (err) { /* private mode / blocked storage */ }
+  }
+
+  function loadTeamNames() {
+    try {
+      const raw = localStorage.getItem(TEAM_NAME_KEY);
+      if (!raw) return;
+      const data = JSON.parse(raw);
+      if (data.name0) el.name0.value = data.name0;
+      if (data.name1) el.name1.value = data.name1;
+    } catch (err) { /* ignore bad data */ }
+  }
+
+  function saveRoundsText() {
+    try {
+      localStorage.setItem(ROUNDS_TEXT_KEY, el.editor.value);
+    } catch (err) { /* private mode / blocked storage */ }
+  }
+
+  function loadSavedRoundsText() {
+    try {
+      const raw = localStorage.getItem(ROUNDS_TEXT_KEY);
+      if (!raw || !String(raw).trim()) return null;
+      const parsed = parseRounds(raw);
+      if (!parsed.length) return null;
+      return raw;
+    } catch (err) {
+      return null;
+    }
+  }
+
+  function refreshTeamLabels() {
+    const n0 = teamLabel(0);
+    const n1 = teamLabel(1);
+    el.label0.textContent = n0;
+    el.label1.textContent = n1;
+    renderRosters();
+    el.btnGive0.textContent = "Override → " + n0 + " control";
+    el.btnGive1.textContent = "Override → " + n1 + " control";
+    if (el.btnBuzz0) el.btnBuzz0.textContent = "Q · " + n0 + " buzzed first";
+    if (el.btnBuzz1) el.btnBuzz1.textContent = "P · " + n1 + " buzzed first";
+    el.name0.setAttribute("aria-label", "Team 1 name: " + n0);
+    el.name1.setAttribute("aria-label", "Team 2 name: " + n1);
+    publishToDisplay();
+  }
+
+  function resetFaceOffDuel() {
+    faceOffOpener = null;
+    faceOffAttempt = 0;
+    faceOffBestPts = null;
+    faceOffBestTeam = null;
+  }
+
+  function clearBuzz() {
+    buzzTeam = null;
+    resetFaceOffDuel();
+    el.team0.classList.remove("buzzed");
+    el.team1.classList.remove("buzzed");
+    updateBuzzReady();
+    publishToDisplay();
+  }
+
+  function updateBuzzReady() {
+    // Ready to pick who goes first only when nobody is answering yet
+    const ready = phase === "faceoff" && buzzTeam === null;
+    el.team0.classList.toggle("buzz-ready", ready);
+    el.team1.classList.toggle("buzz-ready", ready);
+  }
+
+  function applyBuzzVisual() {
+    // Remove first, force reflow, then add — restarts CSS flash animation on switch
+    el.team0.classList.remove("buzzed");
+    el.team1.classList.remove("buzzed");
+    void el.team0.offsetWidth;
+    void el.team1.offsetWidth;
+    if (buzzTeam === 0) el.team0.classList.add("buzzed");
+    if (buzzTeam === 1) el.team1.classList.add("buzzed");
+    updateBuzzReady();
+  }
+
+  /**
+   * Flashing team = who is currently answering / has face-off edge.
+   * sound: play lock-in chirp when turn changes.
+   */
+  function setAnsweringTeam(team, opts) {
+    opts = opts || {};
+    if (team !== 0 && team !== 1) return;
+    buzzTeam = team;
+    phase = "faceoff";
+    applyBuzzVisual();
+    if (opts.sound) {
+      try {
+        playBuzzIn();
+      } catch (e) { /* ignore audio errors so flash still switches */ }
+    }
+    if (el.phase) el.phase.textContent = "Answering: " + teamLabel(team);
+    if (opts.status) {
+      if (el.status) el.status.textContent = opts.status;
+    }
+    // 10 seconds for this face-off captain to answer
+    startAnswerTimer(
+      TIMER_FACEOFF_SEC,
+      "Face-off — " + teamLabel(team) + " (" + TIMER_FACEOFF_SEC + "s)"
+    );
+    publishToDisplay();
+    updateHostStep();
+  }
+
+  /**
+   * Hand face-off to the other team (auto after first miss/non-#1, or host Pass).
+   */
+  function passFaceOffTurn(reason, opts) {
+    opts = opts || {};
+    if (buzzTeam !== 0 && buzzTeam !== 1) return false;
+    const from = buzzTeam;
+    const next = from === 0 ? 1 : 0;
+    activePlayer[from] = null;
+    if (!opts.keepAttempt) {
+      if (faceOffAttempt === 0) faceOffAttempt = 1;
+    }
+    // Optional: when the face-off "winner" passes play to the other side,
+    // treat the recipient as the new edge holder for messaging.
+    if (opts.transferEdge && faceOffBestTeam === from) {
+      faceOffBestTeam = next;
+    }
+    setAnsweringTeam(next, {
+      sound: true,
+      status:
+        (reason ? reason + " " : "") +
+        teamLabel(next) + " is answering now (flashing). " +
+        (faceOffBestPts !== null && !opts.transferEdge
+          ? "Need more than " + faceOffBestPts + " pts to take the face-off. "
+          : "") +
+        "Use Pass again to hand it back, or award face-off control when ready.",
+    });
+    return true;
+  }
+
+  /**
+   * Pass control / answering turn to the other team.
+   * - Face-off: switches green flash (who's answering the face-off).
+   * - Main play: switches gold control highlight after face-off is won
+   *   (face-off winners can pass the board to the other team).
+   */
+  function hostPassFaceOff() {
+    // Main play: face-off already decided — pass board control + gold highlight
+    if (phase === "play" && (controlTeam === 0 || controlTeam === 1)) {
+      const from = controlTeam;
+      const next = from === 0 ? 1 : 0;
+      activePlayer[from] = null;
+      controlTeam = next;
+      faceOffBestTeam = next;
+      buzzTeam = null;
+      applyBuzzVisual();
+      setPhase("play", "Main play — " + teamLabel(next));
+      startAnswerTimer(
+        TIMER_PLAY_SEC,
+        "Main play — " + teamLabel(next) + " (" + TIMER_PLAY_SEC + "s)"
+      );
+      setStatus(
+        teamLabel(from) + " passes the board. " + teamLabel(next) +
+        " now has control (gold highlight) · " + TIMER_PLAY_SEC + "s on the clock."
+      );
+      renderScores(); // updates gold box + audience board
+      return;
+    }
+
+    // Face-off: switch who is answering (green flash)
+    if (phase === "faceoff" || phase === "idle") {
+      if (buzzTeam !== 0 && buzzTeam !== 1) {
+        setStatus("No team is flashing yet. Mark who buzzed first with Q / P, then Pass works.");
+        return;
+      }
+      if (phase !== "faceoff") phase = "faceoff";
+      const passer = teamLabel(buzzTeam);
+      const ok = passFaceOffTurn(passer + " passes.", {
+        keepAttempt: false,
+        transferEdge: true,
+      });
+      if (!ok) {
+        setStatus("Could not pass — try Clear buzz, then Q/P again.");
+      }
+      return;
+    }
+
+    if (phase === "steal") {
+      setStatus("During steal, the other team is already answering — no Pass needed.");
+      return;
+    }
+
+    setStatus("Pass works during face-off (answering turn) or main play (board control).");
+  }
+
+  /**
+   * Host marks which captain raised their hand / buzzed first (Teams meeting).
+   * That team flashes = currently answering.
+   */
+  function registerBuzz(team) {
+    if (team !== 0 && team !== 1) return;
+    if (phase !== "faceoff" && phase !== "idle") {
+      setStatus("Buzz-in is for face-off. Start Face-Off first.");
+      return;
+    }
+    if (phase === "idle") {
+      if (!answers.length) {
+        setStatus("Load a round and start Face-Off, then mark who buzzed first.");
+        return;
+      }
+      setPhase("faceoff", "Face-Off");
+    }
+    if (buzzTeam !== null) {
+      setStatus(
+        teamLabel(buzzTeam) + " is flashing (answering / has the edge). " +
+        "Use Pass to hand the turn over, or Clear buzz to re-call."
+      );
+      return;
+    }
+    resetFaceOffDuel();
+    faceOffOpener = team;
+    faceOffAttempt = 0;
+    // Player-mode sting only on first hand-raise / buzz-in (not on Pass or face-off win)
+    playPlayerMode();
+    setAnsweringTeam(team, {
+      sound: false, // don't also play the short chirp
+      status:
+        teamLabel(team) + " raised hand / buzzed first and is answering. " +
+        "#1 answer = they keep flash and win face-off. " +
+        "Wrong or any lower answer → other team gets one try to beat it. " +
+        "If the 2nd team beats it, they keep the flash (they have control).",
+    });
+  }
+
+  function parseRounds(text) {
+    const blocks = text.replace(/\r\n/g, "\n").split(/\n\s*\n/);
+    const out = [];
+    blocks.forEach(function (block) {
+      const lines = block.split("\n").map(function (l) { return l.trim(); }).filter(Boolean);
+      if (lines.length < 2) return;
+      const question = lines[0];
+      const ans = [];
+      for (let i = 1; i < lines.length; i++) {
+        const m = lines[i].match(/^(.+?)\s*\|\s*(\d+)\s*$/);
+        if (!m) continue;
+        ans.push({ text: m[1].trim(), points: parseInt(m[2], 10), revealed: false });
+      }
+      if (ans.length) {
+        ans.sort(function (a, b) { return b.points - a.points; });
+        out.push({ question: question, answers: ans });
+      }
+    });
+    return out;
+  }
+
+  function loadRound(i) {
+    if (!rounds.length) {
+      el.question.textContent = "Add questions in the editor below, then Apply.";
+      el.answers.innerHTML = "";
+      return;
+    }
+    hideWinner();
+    stopAnswerTimer();
+    clearBuzz();
+    roundIndex = ((i % rounds.length) + rounds.length) % rounds.length;
+    const r = rounds[roundIndex];
+    answers = r.answers.map(function (a) {
+      return { text: a.text, points: a.points, revealed: false };
+    });
+    roundPoints = 0;
+    strikes = 0;
+    controlTeam = null;
+    activePlayer = [null, null];
+    phase = "idle";
+    render();
+    updateBuzzReady();
+    setStatus("Round " + (roundIndex + 1) + " loaded. Start Face-Off when ready.");
+  }
+
+  function setStatus(msg) {
+    el.status.textContent = msg;
+    publishToDisplay();
+  }
+
+  function setPhase(name, label) {
+    phase = name;
+    el.phase.textContent = label;
+    publishToDisplay();
+    updateHostStep();
+  }
+
+  function boardIntroLine(count) {
+    var n = parseInt(count, 10) || 0;
+    if (n < 1) return "We asked 100 people…";
+    return "The top " + n + " answers are on the board. We asked 100 people…";
+  }
+
+  function paintBoardIntro() {
+    if (el.boardIntro) el.boardIntro.textContent = boardIntroLine(answers.length);
+  }
+
+  function otherTeam(team) {
+    return team === 0 ? 1 : 0;
+  }
+
+  function addHostNextButton(label, className, onClick) {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = className || "";
+    btn.textContent = label;
+    btn.addEventListener("click", onClick);
+    el.hostNextActions.appendChild(btn);
+  }
+
+  /** Host strip: only the next legal move for a Teams call. */
+  function updateHostStep() {
+    if (!el.hostNextPrompt || !el.hostNextActions) return;
+    el.hostNextActions.innerHTML = "";
+    const n0 = teamLabel(0);
+    const n1 = teamLabel(1);
+
+    if (!answers.length) {
+      el.hostNextPrompt.textContent = "Apply questions below, then start the face-off.";
+      return;
+    }
+
+    if (phase === "idle") {
+      el.hostNextPrompt.textContent = "Start the face-off, then mark who raised a hand first.";
+      addHostNextButton("Start Face-Off", "gold host-next-lg", startFaceOff);
+      return;
+    }
+
+    if (phase === "faceoff" && (buzzTeam !== 0 && buzzTeam !== 1)) {
+      el.hostNextPrompt.textContent = "Who raised their hand first?";
+      addHostNextButton(n0 + " first", "gold host-next-lg", function () { registerBuzz(0); });
+      addHostNextButton(n1 + " first", "gold host-next-lg", function () { registerBuzz(1); });
+      return;
+    }
+
+    if (phase === "faceoff") {
+      const answering = teamLabel(buzzTeam);
+      if (faceOffAttempt === 1 && faceOffBestPts !== null) {
+        el.hostNextPrompt.textContent =
+          answering + " needs more than " + faceOffBestPts +
+          " points. Flip their answer in the key, or Wrong if they missed.";
+      } else if (faceOffAttempt === 1) {
+        el.hostNextPrompt.textContent =
+          answering + " is answering. Flip their answer in the key, or Wrong if they missed.";
+      } else {
+        el.hostNextPrompt.textContent =
+          answering + " is answering. Flip their answer in the key, or Wrong if they missed.";
+      }
+      addHostNextButton("Wrong / missed", "danger host-next-lg", wrongAnswer);
+      return;
+    }
+
+    if (phase === "choosemode") {
+      const winner = (faceOffBestTeam === 0 || faceOffBestTeam === 1)
+        ? faceOffBestTeam
+        : controlTeam;
+      const other = otherTeam(winner);
+      el.hostNextPrompt.textContent =
+        teamLabel(winner) + " won the face-off. Play the board, or pass to " +
+        teamLabel(other) + "?";
+      addHostNextButton(
+        "Play — " + teamLabel(winner) + " takes the board",
+        "gold host-next-lg",
+        choosePlay
+      );
+      addHostNextButton(
+        "Pass — " + teamLabel(other) + " takes the board",
+        "host-next-lg",
+        choosePass
+      );
+      return;
+    }
+
+    if (phase === "play") {
+      el.hostNextPrompt.textContent =
+        teamLabel(controlTeam) + " has the board. Flip matching answers in the key. Wrong = a strike.";
+      addHostNextButton("Wrong / strike", "danger host-next-lg", wrongAnswer);
+      return;
+    }
+
+    if (phase === "steal") {
+      const stealer = (controlTeam === 0 || controlTeam === 1) ? otherTeam(controlTeam) : null;
+      el.hostNextPrompt.textContent =
+        (stealer !== null ? teamLabel(stealer) : "The other team") +
+        " steals. Flip ONE correct answer, or Wrong if they miss.";
+      addHostNextButton("Wrong — steal missed", "danger host-next-lg", wrongAnswer);
+      return;
+    }
+
+    if (phase === "done") {
+      el.hostNextPrompt.textContent = "Round over. Next round when you are ready.";
+      addHostNextButton("Next round", "gold host-next-lg", nextRound);
+      return;
+    }
+
+    el.hostNextPrompt.textContent = "Use the answer key below, or open All controls.";
+  }
+
+  /**
+   * Face-off is decided. Host (and the winning team) pick Play or Pass
+   * before main play starts.
+   */
+  function offerPlayOrPass(team, detailMsg) {
+    if (team !== 0 && team !== 1) return;
+    if (!answers.length || allRevealed()) {
+      lockFaceOffWinner(team, detailMsg);
+      tryAwardBoardClear();
+      return;
+    }
+    faceOffBestTeam = team;
+    controlTeam = team;
+    strikes = 0;
+    buzzTeam = null;
+    applyBuzzVisual();
+    stopAnswerTimer();
+    setPhase("choosemode", "Play or Pass — " + teamLabel(team));
+    setStatus(
+      (detailMsg ? detailMsg + " " : "") +
+      teamLabel(team) + " won the face-off. Play the board, or Pass to " +
+      teamLabel(otherTeam(team)) + "?"
+    );
+    renderScores();
+  }
+
+  function choosePlay() {
+    if (phase !== "choosemode") return;
+    const team = (faceOffBestTeam === 0 || faceOffBestTeam === 1)
+      ? faceOffBestTeam
+      : controlTeam;
+    const kept = activePlayer[team];
+    lockFaceOffWinner(team, teamLabel(team) + " plays the board.");
+    // Face-off answer already happened — next teammate is up unless host already picked one.
+    if (kept != null && activePlayer[team] === kept) {
+      advanceActivePlayer(team);
+    }
+  }
+
+  function choosePass() {
+    if (phase !== "choosemode") return;
+    const winner = (faceOffBestTeam === 0 || faceOffBestTeam === 1)
+      ? faceOffBestTeam
+      : controlTeam;
+    if (winner !== 0 && winner !== 1) return;
+    const other = otherTeam(winner);
+    activePlayer[winner] = null;
+    activePlayer[other] = null;
+    renderRosters();
+    lockFaceOffWinner(
+      other,
+      teamLabel(winner) + " passes. Click who on " + teamLabel(other) + " is answering."
+    );
+  }
+
+  function allRevealed() {
+    return answers.every(function (a) { return a.revealed; });
+  }
+
+  function remainingAnswers() {
+    return answers.filter(function (a) { return !a.revealed; });
+  }
+
+  /**
+   * Gold box highlight: control team in main play;
+   * during steal, the other team (the one attempting the steal).
+   */
+  function highlightTeam() {
+    if (phase === "steal" && controlTeam !== null) {
+      return controlTeam === 0 ? 1 : 0;
+    }
+    return controlTeam;
+  }
+
+  function renderScores() {
+    el.score0.textContent = String(scores[0]);
+    el.score1.textContent = String(scores[1]);
+    el.roundPoints.textContent = String(roundPoints);
+    const hi = highlightTeam();
+    el.team0.classList.toggle("control", hi === 0);
+    el.team1.classList.toggle("control", hi === 1);
+    publishToDisplay();
+  }
+
+  function renderStrikes() {
+    const slots = el.strikes.querySelectorAll(".strike-slot");
+    slots.forEach(function (slot, i) {
+      const shouldOn = i < strikes;
+      const wasOn = slot.classList.contains("on");
+      slot.classList.toggle("on", shouldOn);
+      // Re-trigger pop animation when a new strike lights up
+      if (shouldOn && !wasOn) {
+        slot.classList.remove("pop");
+        void slot.offsetWidth;
+        slot.classList.add("pop");
+      }
+      if (!shouldOn) slot.classList.remove("pop");
+    });
+    publishToDisplay();
+  }
+
+  function renderAnswerKey() {
+    if (!el.answerKeyList) return;
+    el.answerKeyList.innerHTML = "";
+    if (!answers.length) {
+      const p = document.createElement("p");
+      p.className = "answer-key-empty";
+      p.textContent = "No answers loaded. Apply a round in the editor below.";
+      el.answerKeyList.appendChild(p);
+      return;
+    }
+    answers.forEach(function (a, i) {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "answer-key-row" + (a.revealed ? " revealed" : "");
+      btn.setAttribute(
+        "aria-label",
+        (a.revealed ? "Already revealed: " : "Flip answer ") +
+          (i + 1) + ": " + a.text + ", " + a.points + " points"
+      );
+      if (!a.revealed) {
+        btn.title = "Click to flip #" + (i + 1) + " on the board";
+        btn.addEventListener("click", function () {
+          revealAnswer(i, true);
+        });
+      } else {
+        btn.disabled = true;
+      }
+
+      const num = document.createElement("span");
+      num.className = "key-num";
+      num.textContent = String(i + 1);
+
+      const text = document.createElement("span");
+      text.className = "key-text";
+      text.textContent = a.text;
+
+      const pts = document.createElement("span");
+      pts.className = "key-pts";
+      pts.textContent = String(a.points);
+
+      const state = document.createElement("span");
+      state.className = "key-state " + (a.revealed ? "shown-state" : "hidden-state");
+      state.textContent = a.revealed ? "Shown" : "Hidden";
+
+      btn.appendChild(num);
+      btn.appendChild(text);
+      btn.appendChild(pts);
+      btn.appendChild(state);
+      el.answerKeyList.appendChild(btn);
+    });
+  }
+
+  function renderAnswers() {
+    el.answers.innerHTML = "";
+    el.revealSelect.innerHTML = "";
+    answers.forEach(function (a, i) {
+      const row = document.createElement("div");
+      row.className = "answer-row";
+
+      const num = document.createElement("div");
+      num.className = "answer-num";
+      num.textContent = String(i + 1);
+
+      const face = document.createElement("button");
+      face.type = "button";
+      // justFlipped: start closed, then add is-open next frame for spin animation
+      // already revealed: is-open no-anim (show answer, no re-spin)
+      face.className = "answer-face" +
+        (a.revealed && !a.justFlipped ? " is-open no-anim" : "");
+      if (a.revealed) face.disabled = true;
+
+      const inner = document.createElement("div");
+      inner.className = "answer-face-inner";
+
+      const front = document.createElement("div");
+      front.className = "answer-face-front";
+      front.innerHTML = '<span class="hidden-label">••••••••</span>';
+
+      const back = document.createElement("div");
+      back.className = "answer-face-back";
+      back.textContent = a.text;
+
+      inner.appendChild(front);
+      inner.appendChild(back);
+      face.appendChild(inner);
+
+      if (!a.revealed) {
+        face.addEventListener("click", function () { revealAnswer(i, true); });
+      }
+
+      const pts = document.createElement("div");
+      pts.className = "answer-pts" + (a.revealed && !a.justFlipped ? "" : " dim");
+      pts.textContent = a.revealed ? String(a.points) : "—";
+
+      row.appendChild(num);
+      row.appendChild(face);
+      row.appendChild(pts);
+      el.answers.appendChild(row);
+
+      // Spin downward as the bell rings
+      if (a.justFlipped) {
+        requestAnimationFrame(function () {
+          requestAnimationFrame(function () {
+            face.classList.add("is-open");
+            pts.classList.remove("dim");
+            pts.classList.add("pop-in");
+          });
+        });
+      }
+
+      // Reveal dropdown: show number + answer text for host
+      if (!a.revealed) {
+        const opt = document.createElement("option");
+        opt.value = String(i);
+        opt.textContent = (i + 1) + " — " + a.text + " (" + a.points + ")";
+        el.revealSelect.appendChild(opt);
+      }
+    });
+
+    if (!el.revealSelect.options.length) {
+      const opt = document.createElement("option");
+      opt.value = "";
+      opt.textContent = "— all revealed —";
+      el.revealSelect.appendChild(opt);
+    }
+
+    renderAnswerKey();
+  }
+
+  function render() {
+    paintBoardIntro();
+    if (rounds[roundIndex]) {
+      el.question.textContent = rounds[roundIndex].question;
+    }
+    renderAnswers();
+    renderRosters();
+    renderScores();
+    renderStrikes();
+    // Keep buzz highlight in sync for host preview
+    applyBuzzVisual();
+    publishToDisplay();
+    updateHostStep();
+  }
+
+  /**
+   * Full-screen strike X's (1 / 2 / 3 matching strike count).
+   * count defaults to 1 (face-off miss, steal miss, etc.).
+   */
+  function showBigX(count) {
+    count = Math.max(1, Math.min(3, parseInt(count, 10) || 1));
+    el.bigX.classList.remove("show", "count-1", "count-2", "count-3");
+    el.bigX.classList.add("count-" + count);
+    el.bigX.innerHTML = "";
+    for (var i = 0; i < count; i++) {
+      var mark = document.createElement("div");
+      mark.className = "x-mark";
+      mark.textContent = "✖";
+      el.bigX.appendChild(mark);
+    }
+    void el.bigX.offsetWidth;
+    el.bigX.classList.add("show");
+    el.bigX.setAttribute("aria-hidden", "false");
+    // Audience board: buzzer + matching X count (audio only there)
+    emitSound({ sound: "buzzer", bigX: true, bigXCount: count });
+    window.setTimeout(function () {
+      el.bigX.classList.remove("show");
+      el.bigX.setAttribute("aria-hidden", "true");
+    }, 1350);
+  }
+
+  function hideWinner() {
+    if (winnerHideTimer) {
+      window.clearTimeout(winnerHideTimer);
+      winnerHideTimer = null;
+    }
+    el.winnerOverlay.classList.remove("show", "steal", "hold", "clear", "celebrate", "leftovers");
+    el.winnerOverlay.setAttribute("aria-hidden", "true");
+    noteFx({ hideWinner: true, sound: "stopTheme" });
+    publishToDisplay();
+  }
+
+  /**
+   * Winner banner on host (text only). Confetti + music on audience board.
+   * kind: "steal" | "hold" | "clear"
+   *   steal = other team stole correctly → stealer celebrates
+   *   hold  = stealer missed → original face-off/control team celebrates
+   *   clear = control team swept the board → they celebrate
+   */
+  function showWinner(teamIndex, points, kind, detail) {
+    if (winnerHideTimer) {
+      window.clearTimeout(winnerHideTimer);
+      winnerHideTimer = null;
+    }
+    el.winnerOverlay.classList.remove("show", "steal", "hold", "clear", "celebrate", "leftovers");
+    const name = teamLabel(teamIndex);
+    const totalScore = scores[teamIndex] || 0;
+    const celebrate = kind === "clear" || kind === "steal" || kind === "hold";
+    const kickers = {
+      steal: "Steal successful!",
+      hold: "Steal missed — they hold the board!",
+      clear: "Board cleared — sweep!",
+    };
+    el.winnerKicker.textContent = kickers[kind] || "Round winner";
+    el.winnerTeam.textContent = name + " wins!";
+    el.winnerPoints.textContent = "+" + points + " this round";
+    const leftovers = remainingAnswers().length > 0;
+    el.winnerDetail.textContent =
+      (detail || "") +
+      (leftovers
+        ? "  ·  Flip remaining answers for the audience (no points)"
+        : celebrate
+          ? "  ·  Confetti + music on audience board"
+          : "");
+    // Host: plain text only (never confetti / never music)
+    el.winnerOverlay.classList.add("show", kind || "clear");
+    if (leftovers) el.winnerOverlay.classList.add("leftovers");
+    el.winnerOverlay.setAttribute("aria-hidden", "false");
+
+    // Audience-only celebration cue (token deduped on player board so retries don't stack music)
+    if (celebrate) celebrateToken += 1;
+    const token = celebrate ? celebrateToken : 0;
+    const cue = {
+      sound: celebrate ? "faceoff" : null,
+      themeMs: celebrate ? CELEBRATE_THEME_MS : null,
+      winner: {
+        kind: kind,
+        teamName: name,
+        teamIndex: teamIndex,
+        points: points,
+        totalScore: totalScore,
+        detail: detail || "",
+        celebrate: celebrate,
+        leftovers: leftovers,
+        confettiMs: celebrate ? CELEBRATE_THEME_MS : null,
+        celebrateToken: token,
+        playTheme: celebrate,
+        playConfetti: celebrate,
+      },
+    };
+    noteFx(cue);
+    publishToDisplay();
+    // Re-deliver same celebration (new fx id, same token) so audience doesn't miss it
+    if (celebrate) {
+      [150, 450].forEach(function (ms) {
+        window.setTimeout(function () {
+          noteFx(cue);
+          publishToDisplay();
+        }, ms);
+      });
+    }
+
+    const holdMs = celebrate ? CELEBRATE_THEME_MS + 500 : 4500;
+    winnerHideTimer = window.setTimeout(function () {
+      el.winnerOverlay.classList.remove("show", "steal", "hold", "clear", "celebrate", "leftovers");
+      el.winnerOverlay.setAttribute("aria-hidden", "true");
+      noteFx({ hideWinner: true, sound: "stopTheme" });
+      publishToDisplay();
+    }, holdMs);
+  }
+
+  function awardRound(teamIndex, points, kind, detail) {
+    if (teamIndex === null || teamIndex === undefined) return;
+    if (phase === "done") return; // already awarded
+    const pts = Math.max(0, points | 0);
+    scores[teamIndex] += pts;
+    roundPoints = 0;
+    controlTeam = teamIndex;
+    stopAnswerTimer();
+    clearBuzz();
+    setPhase("done", kind === "steal" ? "Stolen!" : kind === "hold" ? "Held!" : "Board clear!");
+    setStatus(
+      (detail ? detail + " " : "") +
+      teamLabel(teamIndex) + " wins the round (+" + pts + ")." +
+      (remainingAnswers().length
+        ? " Flip remaining answers for the audience — no extra points or music."
+        : "")
+    );
+    renderScores();
+    showWinner(teamIndex, pts, kind, detail);
+  }
+
+  /** Resolve who should get the round if the board is fully revealed. */
+  function resolveRoundWinnerTeam() {
+    if (controlTeam === 0 || controlTeam === 1) return controlTeam;
+    if (faceOffBestTeam === 0 || faceOffBestTeam === 1) return faceOffBestTeam;
+    if (buzzTeam === 0 || buzzTeam === 1) return buzzTeam;
+    if (faceOffOpener === 0 || faceOffOpener === 1) return faceOffOpener;
+    return null;
+  }
+
+  /**
+   * When every answer is face-up, automatically award the board (confetti).
+   * No host “who wins” click required.
+   */
+  function tryAwardBoardClear() {
+    if (phase === "done" || phase === "steal") return false;
+    if (!answers.length || !allRevealed()) return false;
+
+    var winner = resolveRoundWinnerTeam();
+    if (winner !== 0 && winner !== 1) {
+      setStatus(
+        "Board is fully revealed but the face-off winner isn’t known yet. " +
+        "Start Face-Off and mark who buzzed (Q/P), then flip answers."
+      );
+      return false;
+    }
+
+    const pts = roundPoints;
+    awardRound(
+      winner,
+      pts,
+      "clear",
+      teamLabel(winner) + " answered every remaining spot before three strikes — they take the round!"
+    );
+    return true;
+  }
+
+  /**
+   * Face-off is decided → automatic main play for that team.
+   * Host never needs to click “wins face-off” for the normal path.
+   */
+  function lockFaceOffWinner(team, detailMsg) {
+    if (team !== 0 && team !== 1) return;
+    faceOffBestTeam = team;
+    controlTeam = team;
+    strikes = 0;
+    buzzTeam = null;
+    applyBuzzVisual();
+    setPhase("play", "Main play — " + teamLabel(team));
+    setStatus(
+      (detailMsg ? detailMsg + " " : "") +
+      teamLabel(team) + " has control (automatic). " +
+      TIMER_PLAY_SEC + "s on the clock — flips and Wrongs each reset the timer. " +
+      "3 strikes → steal (" + TIMER_PLAY_SEC + "s for the other team)."
+    );
+    renderScores();
+    // 30s for control team to work the board
+    if (!tryAwardBoardClear()) {
+      startAnswerTimer(
+        TIMER_PLAY_SEC,
+        "Main play — " + teamLabel(team) + " (" + TIMER_PLAY_SEC + "s)"
+      );
+    }
+  }
+
+  /** Both face-off captains missed — re-buzz on the same board. */
+  function restartFaceOffAfterDoubleMiss() {
+    faceOffAttempt = 0;
+    faceOffBestPts = null;
+    faceOffBestTeam = null;
+    faceOffOpener = null;
+    buzzTeam = null;
+    controlTeam = null;
+    stopAnswerTimer();
+    applyBuzzVisual();
+    setPhase("faceoff", "Face-Off — both missed");
+    setStatus(
+      "Both captains missed. Face-off again on the same question — press Q/P for who buzzes first."
+    );
+    publishToDisplay();
+  }
+
+  /** After the round is scored: flip leftover tiles for the audience. Bell only — no points or win music. */
+  function revealLeftoverAnswer(index) {
+    if (index < 0 || index >= answers.length) return;
+    const a = answers[index];
+    if (a.revealed) return;
+    a.revealed = true;
+    a.justFlipped = true;
+    playBell({ flipIndex: index });
+    render();
+    setStatus("Showing remaining answers for the audience (no points).");
+    window.setTimeout(function () {
+      a.justFlipped = false;
+    }, 900);
+  }
+
+  function revealAnswer(index, fromClick) {
+    if (index < 0 || index >= answers.length) return;
+    const a = answers[index];
+    if (a.revealed) return;
+
+    if (phase === "idle") {
+      setStatus("Start Face-Off first (or assign control), then flip answers.");
+      return;
+    }
+    if (phase === "choosemode") {
+      setStatus("Play or Pass first, then keep flipping answers.");
+      return;
+    }
+    if (phase === "done") {
+      revealLeftoverAnswer(index);
+      return;
+    }
+
+    a.revealed = true;
+    a.justFlipped = true;
+    playBell({ flipIndex: index });
+    roundPoints += a.points;
+    render();
+    // Allow re-renders without replaying the flip spin
+    window.setTimeout(function () {
+      a.justFlipped = false;
+    }, 900);
+
+    if (phase === "steal") {
+      // Correct steal answer → stealing team wins all points on the board (+ confetti)
+      const stealer = controlTeam === 0 ? 1 : 0;
+      const holder = controlTeam;
+      const pts = roundPoints;
+      awardRound(
+        stealer,
+        pts,
+        "steal",
+        teamLabel(stealer) + " stole with \"" + a.text + "\"! " +
+        "They take the board from " + teamLabel(holder) + "."
+      );
+      return;
+    }
+
+    if (phase === "faceoff") {
+      // Prefer flashing team; fall back to opener if host flipped without Q/P
+      const whoTeam = (buzzTeam === 0 || buzzTeam === 1)
+        ? buzzTeam
+        : (faceOffOpener === 0 || faceOffOpener === 1 ? faceOffOpener : null);
+      const who = whoTeam !== null ? teamLabel(whoTeam) : "That team";
+
+      // #1 answer — automatic face-off win + main play
+      if (index === 0) {
+        faceOffBestPts = a.points;
+        if (whoTeam === 0 || whoTeam === 1) {
+          offerPlayOrPass(
+            whoTeam,
+            who + " got the #1 answer: \"" + a.text + "\" (" + a.points + " pts)!"
+          );
+        } else {
+          setStatus(
+            "#1 revealed (\"" + a.text + "\"). Mark who buzzed first (Q/P) so control can be assigned."
+          );
+        }
+        return;
+      }
+
+      if (whoTeam === null) {
+        setStatus(
+          "Face-off reveal: \"" + a.text + "\" (" + a.points + " pts). " +
+          "Press Q/P first so we know which team is answering."
+        );
+        tryAwardBoardClear();
+        return;
+      }
+
+      // First captain's non-#1 answer → other team gets one try to beat it
+      if (faceOffAttempt === 0) {
+        faceOffBestPts = a.points;
+        faceOffBestTeam = whoTeam;
+        faceOffAttempt = 1;
+        passFaceOffTurn(
+          who + " got \"" + a.text + "\" (#" + (index + 1) + ", " + a.points +
+          " pts) — not #1. Other team can try for higher."
+        );
+        return;
+      }
+
+      // Second captain: any better score (or first had no score) → they win face-off
+      if (faceOffBestPts === null || a.points > faceOffBestPts) {
+        faceOffBestPts = a.points;
+        offerPlayOrPass(
+          whoTeam,
+          who + " got \"" + a.text + "\" (#" + (index + 1) + ", " + a.points +
+          " pts) — higher! They win the face-off."
+        );
+        return;
+      }
+
+      // Second team equal/lower — first team keeps face-off
+      if (faceOffBestTeam === 0 || faceOffBestTeam === 1) {
+        offerPlayOrPass(
+          faceOffBestTeam,
+          who + " got \"" + a.text + "\" (" + a.points + " pts) — not higher than " +
+          faceOffBestPts + ". " + teamLabel(faceOffBestTeam) + " wins the face-off."
+        );
+      } else {
+        offerPlayOrPass(
+          whoTeam,
+          who + " got \"" + a.text + "\" (" + a.points + " pts) and wins the face-off."
+        );
+      }
+      return;
+    }
+
+    if (phase === "play") {
+      if (tryAwardBoardClear()) return;
+      advanceActivePlayer(controlTeam);
+      // Correct answer resets the 30s main-play clock
+      startAnswerTimer(
+        TIMER_PLAY_SEC,
+        "Main play — " + teamLabel(controlTeam) + " (" + TIMER_PLAY_SEC + "s)"
+      );
+      setStatus(
+        "\"" + a.text + "\" — " + a.points + " pts. Round total: " + roundPoints +
+        ". " + remainingAnswers().length + " left · " + TIMER_PLAY_SEC + "s reset." +
+        (answeringName(controlTeam) ? " Next: " + answeringName(controlTeam) + "." : "")
+      );
+    }
+  }
+
+  function wrongAnswer() {
+    if (!answers.length) {
+      setStatus("Load a round first, then use Wrong / Strike.");
+      return;
+    }
+
+    // Steal miss → original face-off/control team wins the board (+ confetti for them)
+    if (phase === "steal") {
+      showBigX(1); // includes buzzer on audience board
+      if (controlTeam !== null) {
+        const holder = controlTeam;
+        const stealer = controlTeam === 0 ? 1 : 0;
+        const pts = roundPoints;
+        // Brief beat so the big X shows, then full win celebration for the holder
+        window.setTimeout(function () {
+          awardRound(
+            holder,
+            pts,
+            "hold",
+            teamLabel(stealer) + " missed the steal. " +
+            teamLabel(holder) + " (face-off winners) keep the board and win the round!"
+          );
+        }, 850);
+      } else {
+        setPhase("done", "Steal failed");
+        setStatus("Steal missed — no control team set.");
+      }
+      return;
+    }
+
+    if (phase === "choosemode") {
+      setStatus("Play or Pass first — then Wrong is a strike during main play.");
+      return;
+    }
+
+    if (phase === "done") {
+      setStatus("Round is over. Flip remaining answers for the audience, then next round.");
+      return;
+    }
+
+    // Always light the three strike boxes on a miss (face-off + main play).
+    // Increment first so the full-screen X's match strike 1 / 2 / 3
+    strikes = Math.min(3, strikes + 1);
+    showBigX(strikes); // buzzer + X's on audience board only
+    renderStrikes();
+
+    if (phase === "faceoff" || phase === "idle") {
+      // Face-off miss — fully automatic handoff / restart
+      if (phase === "faceoff" && buzzTeam !== null) {
+        const missedTeam = buzzTeam;
+        const missed = teamLabel(missedTeam);
+        // First captain misses → second captain answers automatically
+        if (faceOffAttempt === 0) {
+          faceOffBestPts = null;
+          faceOffBestTeam = null;
+          faceOffAttempt = 1;
+          passFaceOffTurn(missed + " missed. ");
+          return;
+        }
+        // Second captain misses
+        if (faceOffBestTeam === 0 || faceOffBestTeam === 1) {
+          offerPlayOrPass(
+            faceOffBestTeam,
+            missed + " missed. " + teamLabel(faceOffBestTeam) +
+            " wins the face-off with " + faceOffBestPts + " pts."
+          );
+        } else {
+          // Neither captain got a board answer → re-buzz same question
+          restartFaceOffAfterDoubleMiss();
+        }
+        return;
+      }
+      setStatus(
+        phase === "faceoff"
+          ? "Face-off: press Q/P for who buzzed, then flip or Wrong."
+          : "Start Face-Off when ready."
+      );
+      return;
+    }
+
+    // Main play — 3 strikes automatically starts steal for the other team
+    if (strikes >= 3) {
+      var holder = controlTeam;
+      if (holder !== 0 && holder !== 1) holder = faceOffBestTeam;
+      if (holder === 0 || holder === 1) {
+        controlTeam = holder;
+        const other = holder === 0 ? 1 : 0;
+        setPhase("steal", "STEAL: " + teamLabel(other));
+        renderScores();
+        startAnswerTimer(
+          TIMER_PLAY_SEC,
+          "STEAL — " + teamLabel(other) + " (" + TIMER_PLAY_SEC + "s)"
+        );
+        activePlayer[holder] = null;
+        activePlayer[other] = null;
+        renderRosters();
+        setStatus(
+          "Three strikes! " + teamLabel(other) + " steals — " + TIMER_PLAY_SEC +
+          "s on the clock. Click who is stealing, then flip ONE correct answer, or Wrong if they miss " +
+          "(then " + teamLabel(holder) + " wins + confetti)."
+        );
+      } else {
+        stopAnswerTimer();
+        setStatus("Three strikes, but no control team is set. Start Face-Off again.");
+      }
+    } else if (phase === "play") {
+      advanceActivePlayer(controlTeam);
+      // Incorrect answer resets the 30s clock for the control team
+      startAnswerTimer(
+        TIMER_PLAY_SEC,
+        "Main play — " + teamLabel(controlTeam) + " (" + TIMER_PLAY_SEC + "s)"
+      );
+      setStatus(
+        "Strike " + strikes + " of 3" +
+        (controlTeam !== null ? " for " + teamLabel(controlTeam) : "") +
+        " · " + TIMER_PLAY_SEC + "s reset." +
+        (answeringName(controlTeam) ? " Next: " + answeringName(controlTeam) + "." : "")
+      );
+    } else {
+      setStatus(
+        "Strike " + strikes + " of 3" +
+        (controlTeam !== null ? " for " + teamLabel(controlTeam) : "") + "."
+      );
+    }
+  }
+
+  function startFaceOff() {
+    if (!answers.length) return;
+    hideWinner();
+    stopAnswerTimer();
+    clearBuzz();
+    strikes = 0;
+    roundPoints = 0;
+    controlTeam = null;
+    answers.forEach(function (a) { a.revealed = false; });
+    playFaceOffTheme();
+    setPhase("faceoff", "Face-Off — waiting for buzz");
+    setStatus(
+      "Face-off live! Q/P for who raised a hand — they get " + TIMER_FACEOFF_SEC +
+      "s to answer. Timeout → Wrong → other team gets " + TIMER_FACEOFF_SEC + "s."
+    );
+    render();
+    updateBuzzReady();
+  }
+
+  /** Manual override only — normal play assigns control automatically. */
+  function giveControl(team) {
+    if (team !== 0 && team !== 1) return;
+    faceOffBestTeam = team;
+    clearBuzz();
+    controlTeam = team;
+    strikes = 0;
+    setPhase("play", "Main play — " + teamLabel(team));
+    setStatus(
+      "Override: " + teamLabel(team) + " has control. " + TIMER_PLAY_SEC +
+      "s clock. Board clear = auto win · 3 strikes → auto steal."
+    );
+    render();
+    updateBuzzReady();
+    if (!tryAwardBoardClear()) {
+      startAnswerTimer(
+        TIMER_PLAY_SEC,
+        "Main play — " + teamLabel(team) + " (" + TIMER_PLAY_SEC + "s)"
+      );
+    }
+  }
+
+  function startSteal() {
+    if (controlTeam !== 0 && controlTeam !== 1) {
+      controlTeam = resolveRoundWinnerTeam();
+    }
+    if (controlTeam !== 0 && controlTeam !== 1) {
+      setStatus("No control team yet — finish face-off first (automatic after a face-off answer).");
+      return;
+    }
+    strikes = 3;
+    const other = controlTeam === 0 ? 1 : 0;
+    setPhase("steal", "STEAL: " + teamLabel(other));
+    renderStrikes();
+    renderScores();
+    startAnswerTimer(
+      TIMER_PLAY_SEC,
+      "STEAL — " + teamLabel(other) + " (" + TIMER_PLAY_SEC + "s)"
+    );
+    setStatus(
+      teamLabel(other) + " steals with " + TIMER_PLAY_SEC + "s — flip ONE correct answer, " +
+      "or Wrong = " + teamLabel(controlTeam) + " wins automatically."
+    );
+  }
+
+  function bankPoints() {
+    var winner = controlTeam;
+    if (winner !== 0 && winner !== 1) winner = resolveRoundWinnerTeam();
+    if (winner !== 0 && winner !== 1 || roundPoints <= 0) {
+      setStatus("Nothing to bank (need a control team and points on the board).");
+      return;
+    }
+    // Same confetti path as other wins
+    awardRound(
+      winner,
+      roundPoints,
+      "clear",
+      "Host banked the board to " + teamLabel(winner) + "."
+    );
+  }
+
+  function nextRound() {
+    loadRound(roundIndex + 1);
+  }
+
+  /* ========== WIRE UI ========== */
+  el.winnerOverlay.addEventListener("click", hideWinner);
+
+  document.getElementById("btn-open-display").addEventListener("click", function () {
+    // Keep a window handle (no "noopener") so we can postMessage even on file://
+    displayWin = window.open("family-feud.html", "familyFeudAudience");
+    if (syncBus && displayWin) {
+      syncBus.attachWindow(displayWin);
+      window.setTimeout(function () {
+        if (displayWin && !displayWin.closed && syncBus) {
+          syncBus.attachWindow(displayWin);
+          publishToDisplay();
+        }
+      }, 500);
+      window.setTimeout(function () {
+        if (displayWin && !displayWin.closed) publishToDisplay();
+      }, 1200);
+    }
+    const s = document.getElementById("sync-status");
+    if (s) {
+      s.textContent = displayWin
+        ? "Audience board open — share THAT window + computer sound. Click it once to enable audio."
+        : "Pop-up blocked — allow pop-ups or open family-feud.html manually";
+      s.style.color = displayWin ? "#8ef0bc" : "#ff8a8a";
+    }
+  });
+
+  document.getElementById("btn-faceoff").addEventListener("click", startFaceOff);
+  document.getElementById("btn-buzz0").addEventListener("click", function () { registerBuzz(0); });
+  document.getElementById("btn-buzz1").addEventListener("click", function () { registerBuzz(1); });
+  document.getElementById("btn-clear-buzz").addEventListener("click", function () {
+    clearBuzz();
+    if (phase === "faceoff") {
+      setPhase("faceoff", "Face-Off — waiting for buzz");
+      setStatus("Buzz cleared. Waiting for next hand raise — Q left / P right.");
+    } else {
+      setStatus("Buzz indicator cleared.");
+    }
+  });
+  document.getElementById("btn-give0").addEventListener("click", function () { giveControl(0); });
+  document.getElementById("btn-give1").addEventListener("click", function () { giveControl(1); });
+  document.getElementById("btn-wrong").addEventListener("click", wrongAnswer);
+  document.getElementById("btn-pass-faceoff").addEventListener("click", function (e) {
+    e.preventDefault();
+    e.stopPropagation();
+    hostPassFaceOff();
+  });
+
+  // Click team scoreboard during face-off to mark who raised hand first
+  // (ignore clicks on the name input so typing still works)
+  function onTeamPanelClick(e, team) {
+    if (e.target && (e.target.tagName === "INPUT" || e.target.tagName === "LABEL" || e.target.classList.contains("player-chip"))) return;
+    if (phase === "faceoff" || phase === "idle") {
+      registerBuzz(team);
+    }
+  }
+  el.team0.addEventListener("click", function (e) { onTeamPanelClick(e, 0); });
+  el.team1.addEventListener("click", function (e) { onTeamPanelClick(e, 1); });
+  document.getElementById("btn-clear-strikes").addEventListener("click", function () {
+    strikes = 0;
+    renderStrikes();
+    if (phase === "steal") {
+      setPhase("play", "Main play");
+      renderScores(); // highlight back to original control team
+    }
+    setStatus("Strikes cleared.");
+  });
+  document.getElementById("btn-steal").addEventListener("click", startSteal);
+  document.getElementById("btn-reveal").addEventListener("click", function () {
+    const v = el.revealSelect.value;
+    if (v === "") return;
+    revealAnswer(parseInt(v, 10), false);
+  });
+  document.getElementById("btn-bank").addEventListener("click", bankPoints);
+  document.getElementById("btn-next").addEventListener("click", nextRound);
+  document.getElementById("btn-reset-scores").addEventListener("click", function () {
+    scores = [0, 0];
+    roundPoints = 0;
+    strikes = 0;
+    controlTeam = null;
+    clearBuzz();
+    setPhase("idle", "Ready");
+    setStatus("Scores reset.");
+    render();
+    updateBuzzReady();
+  });
+
+  document.getElementById("btn-apply-rounds").addEventListener("click", function () {
+    rounds = parseRounds(el.editor.value);
+    if (!rounds.length) {
+      setStatus("Could not parse any rounds. Check the format.");
+      return;
+    }
+    saveRoundsText();
+    loadRound(0);
+    setStatus("Loaded " + rounds.length + " round(s). Saved for next time.");
+  });
+
+  document.getElementById("btn-sample").addEventListener("click", function () {
+    el.editor.value = SAMPLE_TEXT;
+    rounds = parseRounds(SAMPLE_TEXT);
+    saveRoundsText();
+    loadRound(0);
+    setStatus("Sample rounds restored and saved.");
+  });
+
+  el.editor.addEventListener("input", saveRoundsText);
+  el.editor.addEventListener("change", saveRoundsText);
+
+  document.addEventListener("keydown", function (e) {
+    if (e.target && (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA" || e.target.tagName === "SELECT")) {
+      return;
+    }
+    // Dismiss winner banner first so Space/X don't also register a strike.
+    // Number keys still flip leftover answers after the round is scored.
+    if (el.winnerOverlay.classList.contains("show")) {
+      const leftoverKey = e.key >= "1" && e.key <= "8" && phase === "done";
+      if (leftoverKey) {
+        e.preventDefault();
+        revealAnswer(parseInt(e.key, 10) - 1, false);
+        return;
+      }
+      e.preventDefault();
+      hideWinner();
+      return;
+    }
+    const key = e.key.toLowerCase();
+    if (key === "h") {
+      document.body.classList.toggle("audience-mode");
+      return;
+    }
+    // Face-off buzz: Q = left team, P = right team (fast host lock-in)
+    if (key === "q") {
+      e.preventDefault();
+      registerBuzz(0);
+      return;
+    }
+    if (key === "p") {
+      e.preventDefault();
+      registerBuzz(1);
+      return;
+    }
+    if (key === "x" || key === " ") {
+      e.preventDefault();
+      if (phase === "choosemode") return;
+      wrongAnswer();
+      return;
+    }
+    if (key === "b") {
+      bankPoints();
+      return;
+    }
+    if (key === "s") {
+      startSteal();
+      return;
+    }
+    if (key === "c") {
+      strikes = 0;
+      renderStrikes();
+      setStatus("Strikes cleared.");
+      return;
+    }
+    if (key >= "1" && key <= "8") {
+      revealAnswer(parseInt(key, 10) - 1, false);
+    }
+  });
+
+  // Unlock audio on first interaction
+  document.body.addEventListener("click", function once() {
+    try { ctx(); } catch (err) {}
+    document.body.removeEventListener("click", once);
+  });
+
+  // Team names: edit anytime; remember last names in this browser
+  function onTeamNameEdit() {
+    saveTeamNames();
+    refreshTeamLabels();
+    updateHostStep();
+    // If a steal banner is showing team names in the phase badge, keep it current
+    if (phase === "steal" && controlTeam !== null) {
+      const other = controlTeam === 0 ? 1 : 0;
+      setPhase("steal", "STEAL: " + teamLabel(other));
+    }
+  }
+  el.name0.addEventListener("input", onTeamNameEdit);
+  el.name1.addEventListener("input", onTeamNameEdit);
+  el.name0.addEventListener("change", onTeamNameEdit);
+  el.name1.addEventListener("change", onTeamNameEdit);
+
+  // Init
+  loadTeamNames();
+  refreshTeamLabels();
+  const savedRounds = loadSavedRoundsText();
+  el.editor.value = savedRounds || SAMPLE_TEXT;
+  rounds = parseRounds(el.editor.value);
+  loadRound(0);
+  if (savedRounds) {
+    setStatus("Loaded your saved questions (" + rounds.length + " round(s)). Start Face-Off when ready.");
+  }
+})();
+  </script>
+</body>
+</html>

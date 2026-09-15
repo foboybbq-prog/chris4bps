@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Get Involved | Chris Faucher for Bennington School Board</title>
+  <meta name="description" content="Volunteer, host a yard sign, or help spread the word for Chris Faucher for Bennington School Board." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;700&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/styles.css" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="container nav-bar">
+      <a class="brand" href="index.html">
+        <span class="brand-name">Chris Faucher</span>
+        <span class="brand-tag">Bennington School Board</span>
+      </a>
+      <button class="nav-toggle" type="button" aria-label="Open menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+      <ul class="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="about.html">About</a></li>
+        <li><a href="debt-clock.html">Debt Clock</a></li>
+        <li><a href="get-involved.html" aria-current="page">Get Involved</a></li>
+        <li class="nav-cta"><a class="btn btn-primary" href="contact.html">Contact</a></li>
+      </ul>
+    </div>
+  </header>
+
+  <main>
+    <section class="section section-alt">
+      <div class="container">
+        <div class="section-header">
+          <span class="eyebrow">Volunteer</span>
+          <h1>Help Get the Word Out</h1>
+          <p>
+            Local races are won by neighbors talking to neighbors. Please help spread the word.
+          </p>
+        </div>
+
+        <div class="split">
+          <div class="card card-share-wrap">
+            <div class="card-icon" aria-hidden="true">📣</div>
+            <h3>Share the campaign</h3>
+            <p>
+              Tap the button to copy the website link, then paste it to friends and family in the district.
+            </p>
+            <label class="sr-only" for="campaign-share-url">Campaign website</label>
+            <input
+              id="campaign-share-url"
+              class="share-url-field"
+              type="text"
+              readonly
+              value="https://chris4bps.com"
+              onclick="this.select();"
+            />
+            <button type="button" class="btn btn-primary" id="copy-campaign-url">
+              Copy website link
+            </button>
+            <p class="share-feedback" id="copy-campaign-feedback" role="status" aria-live="polite"></p>
+          </div>
+          <div class="card">
+            <div class="card-icon" aria-hidden="true">👋</div>
+            <h3>Talk with neighbors</h3>
+            <p>
+              Local races are won by neighbors talking to neighbors. A yard sign, a forwarded link, or a
+              simple introduction all help.
+            </p>
+            <dl class="contact-details" style="margin-top: 1rem;">
+              <dt>Email</dt>
+              <dd><a href="mailto:info@chris4bps.com">info@chris4bps.com</a></dd>
+              <dt>Phone</dt>
+              <dd><a href="tel:+14022503000">(402) 250-3000</a></dd>
+            </dl>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container split">
+        <div>
+          <span class="eyebrow">Sign up</span>
+          <h2>Tell us how you’d like to help</h2>
+          <p class="text-muted">
+            Submitting this form opens your email app with a draft message to the campaign.
+            Messages go to <a href="mailto:info@chris4bps.com">info@chris4bps.com</a>.
+          </p>
+
+          <form class="form-card" data-campaign-form="volunteer" novalidate>
+            <div class="form-success" role="status"></div>
+
+            <div class="form-row">
+              <label for="name">Full name</label>
+              <input id="name" name="name" type="text" autocomplete="name" required placeholder="Your name" />
+            </div>
+
+            <div class="form-row">
+              <label for="email">Email</label>
+              <input id="email" name="email" type="email" autocomplete="email" required placeholder="you@example.com" />
+            </div>
+
+            <div class="form-row">
+              <label for="phone">Phone <span class="text-muted">(optional)</span></label>
+              <input id="phone" name="phone" type="tel" autocomplete="tel" placeholder="(402) 250-3000" />
+            </div>
+
+            <div class="form-row">
+              <label for="interest">I’m interested in</label>
+              <select id="interest" name="interest">
+                <option value="Share the campaign">Share the campaign</option>
+                <option value="General volunteer">General volunteer</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+
+            <div class="form-row">
+              <label for="message">Notes</label>
+              <textarea id="message" name="message" placeholder="Neighborhood, best times to help, questions…"></textarea>
+            </div>
+
+            <button class="btn btn-primary" type="submit">Submit interest</button>
+            <p class="form-note">We’ll only use your info for campaign coordination.</p>
+          </form>
+        </div>
+
+        <div>
+          <div class="card">
+            <h3>Endorsements &amp; co-hosts</h3>
+            <p>
+              If a neighbor, educator, or community leader wants to endorse or host a gathering, reach out via the
+              form. Always follow local election rules for contributions and disclaimers.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <div class="footer-brand">Chris Faucher</div>
+          <p>Candidate for Bennington Public Schools Board of Education · Bennington, Nebraska</p>
+        </div>
+        <div>
+          <h3>Explore</h3>
+          <ul class="footer-links">
+            <li><a href="about.html">About</a></li>
+            <li><a href="debt-clock.html">Debt Clock</a></li>
+            <li><a href="get-involved.html">Get Involved</a></li>
+            <li><a href="contact.html">Contact</a></li>
+          </ul>
+        </div>
+        <div>
+          <h3>Stay in touch</h3>
+          <ul class="footer-links">
+            <li><a href="mailto:info@chris4bps.com">info@chris4bps.com</a></li>
+            <li><a href="tel:+14022503000">(402) 250-3000</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span class="paid-for">Paid for by Chris Faucher</span>
+        <span>© <span id="year"></span> · Bennington, NE</span>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    document.getElementById("year").textContent = new Date().getFullYear();
+  </script>
+  <script src="js/main.js"></script>
+  <!-- Inline so Share works even if js/main.js is missing or cached on the host -->
+  <script>
+    (function () {
+      var btn = document.getElementById("copy-campaign-url");
+      var field = document.getElementById("campaign-share-url");
+      var feedback = document.getElementById("copy-campaign-feedback");
+      if (!btn || !field) return;
+
+      var url = (field.value || "https://chris4bps.com").trim();
+
+      function setFeedback(msg, ok) {
+        if (!feedback) return;
+        feedback.textContent = msg;
+        feedback.className = "share-feedback" + (ok ? " is-success" : " is-error");
+      }
+
+      function copyWithTextarea(text) {
+        var ta = document.createElement("textarea");
+        ta.value = text;
+        ta.setAttribute("readonly", "");
+        ta.style.position = "fixed";
+        ta.style.top = "0";
+        ta.style.left = "0";
+        ta.style.width = "2em";
+        ta.style.height = "2em";
+        ta.style.padding = "0";
+        ta.style.border = "none";
+        ta.style.outline = "none";
+        ta.style.boxShadow = "none";
+        ta.style.background = "transparent";
+        document.body.appendChild(ta);
+        ta.focus();
+        ta.select();
+        ta.setSelectionRange(0, text.length);
+        var ok = false;
+        try {
+          ok = document.execCommand("copy");
+        } catch (e) {
+          ok = false;
+        }
+        document.body.removeChild(ta);
+        return ok;
+      }
+
+      btn.addEventListener("click", function () {
+        field.select();
+        field.setSelectionRange(0, url.length);
+
+        if (navigator.clipboard && window.isSecureContext && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(url).then(
+            function () {
+              setFeedback("Copied! Paste anywhere: " + url, true);
+            },
+            function () {
+              if (copyWithTextarea(url)) {
+                setFeedback("Copied! Paste anywhere: " + url, true);
+              } else {
+                setFeedback("Select the link above, then press Ctrl+C (or Cmd+C) to copy.", false);
+              }
+            }
+          );
+          return;
+        }
+
+        if (copyWithTextarea(url)) {
+          setFeedback("Copied! Paste anywhere: " + url, true);
+        } else {
+          setFeedback("Select the link above, then press Ctrl+C (or Cmd+C) to copy.", false);
+        }
+      });
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Debt Clock | Chris Faucher for Bennington School Board</title>
+  <meta name="description" content="Bennington Public Schools outstanding bond debt and High School #2 bond facts from public district sources." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;700&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/styles.css" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="container nav-bar">
+      <a class="brand" href="index.html">
+        <span class="brand-name">Chris Faucher</span>
+        <span class="brand-tag">Bennington School Board</span>
+      </a>
+      <button class="nav-toggle" type="button" aria-label="Open menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+      <ul class="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="about.html">About</a></li>
+        <li><a href="debt-clock.html" aria-current="page">Debt Clock</a></li>
+        <li><a href="get-involved.html">Get Involved</a></li>
+        <li class="nav-cta"><a class="btn btn-primary" href="contact.html">Contact</a></li>
+      </ul>
+    </div>
+  </header>
+
+  <main>
+    <section class="section section-alt">
+      <div class="container">
+        <div class="section-header">
+          <span class="eyebrow">Fiscal transparency</span>
+          <h1>Bennington School District debt clock</h1>
+          <p>
+            Figures below come from Bennington Public Schools public budget and bond materials.
+            Outstanding debt is a multi-decade commitment—taxpayers deserve clear, plain-language reporting.
+          </p>
+        </div>
+
+        <div class="debt-clock-pair" role="group" aria-label="Side-by-side debt clocks">
+          <!-- Left: current published debt -->
+          <div class="debt-clock-panel" role="region" aria-label="Current debt clock">
+            <p class="debt-clock-badge">Current debt</p>
+            <p class="debt-label">Principal + interest since as-of date</p>
+            <p class="debt-amount" data-debt-amount>$159,365,000</p>
+            <p class="debt-rate debt-rate-live">
+              <span data-interest-per-second>~$0.20 / sec</span>
+              · interest (est.)
+            </p>
+            <p class="debt-note">
+              Published principal <strong data-debt-base-principal>$159,365,000</strong>
+              as of <strong data-debt-as-of>September 8, 2025</strong>, plus estimated interest
+              (<strong data-interest-accrued>$0</strong>). Whole dollars.
+            </p>
+          </div>
+
+          <!-- Right: current + future authorized HS#2 bond -->
+          <div class="debt-clock-panel debt-clock-panel-future" role="region" aria-label="Current plus future debt clock">
+            <p class="debt-clock-badge debt-clock-badge-future">Current + future debt</p>
+            <p class="debt-label">Adds full $112M HS#2 authorization</p>
+            <p class="debt-amount" data-debt-amount-with-future>$271,365,000</p>
+            <p class="debt-rate debt-rate-live">
+              <span data-interest-per-second-with-future>~$0.35 / sec</span>
+              · interest (est.)
+            </p>
+            <p class="debt-note">
+              Principal <strong data-debt-combined-principal>$271,365,000</strong>
+              (current + <strong data-future-bond-total>$112,000,000</strong> authorized),
+              plus estimated interest at the same ~<span data-interest-rate>4.06%</span> rate
+              (<strong data-interest-accrued-with-future>$0</strong>). Illustrative — full $112M not all issued yet.
+            </p>
+          </div>
+        </div>
+
+        <div class="debt-stats debt-stats-shared">
+          <div class="debt-stat">
+            <strong data-interest-per-second>~$0.20 / sec</strong>
+            <span>Current-debt interest/sec (~<span data-interest-rate>4.06%</span> on published principal)</span>
+          </div>
+          <div class="debt-stat">
+            <strong data-interest-annual>$6,464,216</strong>
+            <span>Est. annual interest on current debt (bond tax asking − principal)</span>
+          </div>
+          <div class="debt-stat">
+            <strong data-interest-per-second-with-future>~$0.35 / sec</strong>
+            <span>With +$112M: same rate on combined principal (~<span data-interest-annual-with-future>$11.0M</span>/yr)</span>
+          </div>
+        </div>
+        <p class="debt-pair-source">
+          Source: <span data-debt-source>BPS Board of Education Budget Hearing presentation (2025–26 budget)</span>.
+          Right clock is a campaign illustration if the full authorized HS#2 bond is outstanding on top of current debt.
+        </p>
+
+        <!-- Current levy & homeowner impact -->
+        <div class="levy-panel" role="region" aria-label="Current school levy">
+          <div class="levy-panel-header">
+            <span class="eyebrow">Property tax levy</span>
+            <h2>What the current BPS levy means for homeowners</h2>
+          </div>
+          <div class="levy-highlight">
+            <div class="levy-rate-block">
+              <p class="debt-label" style="text-align: left; margin: 0;">2025–26 total school levy</p>
+              <p class="levy-rate-figure">$1.358</p>
+              <p class="levy-rate-unit">per $100 of taxable valuation</p>
+            </div>
+            <div class="levy-breakdown">
+              <p><strong>General Fund:</strong> $0.975</p>
+              <p><strong>Special Building Fund:</strong> $0.025</p>
+              <p><strong>Bond Fund (debt service):</strong> $0.358</p>
+              <p class="levy-held">The district held the total levy at <strong>$1.358</strong> for 2025–26—the same rate as the prior year (budget hearing materials).</p>
+            </div>
+          </div>
+          <p class="levy-blurb">
+            In Nebraska, school levies are charged as dollars per $100 of your home’s <em>taxable</em> valuation
+            (not necessarily the full market listing price). For a home with <strong>$300,000</strong> of taxable value,
+            the school portion of the tax bill is about
+            <strong>$4,074 per year</strong>
+            (<span class="levy-math">($300,000 ÷ 100 × $1.358)</span>.
+            Of that, roughly <strong>$1,074</strong> supports the bond fund that pays principal and interest on district debt
+            <span class="levy-math">($300,000 ÷ 100 × $0.358)</span>.
+          </p>
+          <p class="levy-blurb levy-blurb-note">
+            <strong>Why the bill can still go up when the levy rate stays the same:</strong>
+            if the assessor raises your home’s taxable valuation, you pay more even though the rate ($1.358) did not change.
+            The 2025 bond for High School #2 was presented by the district with a <strong>0.0¢</strong> tax-rate increase—
+            but long-term debt still has to be paid through the bond levy, and growth in valuations affects what each household pays.
+          </p>
+        </div>
+
+        <!-- Future / authorized HS#2 debt -->
+        <div class="future-debt-panel" role="region" aria-label="Future debt High School 2 bond">
+          <div class="future-debt-header">
+            <span class="eyebrow" style="color: var(--gold);">Future debt</span>
+            <h2>2025 High School #2 bond (authorized)</h2>
+            <p>
+              Voters approved a new bond for a second high school. District debt rises when bonds are
+              <strong>sold and issued</strong>, typically in phases as construction needs cash—not all on election day.
+            </p>
+          </div>
+
+          <div class="future-debt-amount-row">
+            <div>
+              <p class="debt-label" style="text-align: left; margin: 0;">Authorized bond amount</p>
+              <p class="future-debt-figure" data-future-bond-total>$112,000,000</p>
+            </div>
+            <div class="future-debt-meta">
+              <p><strong>Approved by voters:</strong> <span data-future-approved>March 11, 2025</span> (71% yes)</p>
+              <p><strong>Board authorized issuance/sale:</strong> <span data-future-board-auth>June 9, 2025</span> (up to $112M)</p>
+              <p><strong>Expected first series:</strong> about <span data-future-first-tranche>$55,500,000</span> Series 2026</p>
+              <p><strong>Status:</strong> <span data-future-first-window>Series 2026 ~$55.5M expected; sale closing not confirmed in public records checked</span></p>
+              <p><strong>Remaining authorization (approx.):</strong> <span data-future-remaining>$56,500,000</span> in later sale(s)</p>
+              <p><strong>Campus opens:</strong> <span data-future-opening>2028–29 school year</span></p>
+            </div>
+          </div>
+
+          <div class="debt-stats" style="margin-top: 1.25rem;">
+            <div class="debt-stat">
+              <strong data-future-project-cost>$124,645,829</strong>
+              <span>Total project cost (bond + district reserves)</span>
+            </div>
+            <div class="debt-stat">
+              <strong data-future-reserves>$12,645,829</strong>
+              <span>District reserves applied to the project</span>
+            </div>
+            <div class="debt-stat">
+              <strong>0.0¢</strong>
+              <span>District-stated levy impact of the 2025 bond (tax rate increase)</span>
+            </div>
+          </div>
+
+          <ul class="future-debt-facts">
+            <li><strong>Purpose:</strong> Second high school at 180th Street &amp; Military Road (capacity 1,000 expandable to 1,500).</li>
+            <li><strong>Repayment:</strong> District materials described a ~21-year repayment schedule for the package.</li>
+            <li><strong>Construction:</strong> Guaranteed Maximum Price with Hausmann Construction approved Nov. 2025 (~$98.4M construction GMP, per district newsletter).</li>
+            <li><strong>If fully issued on top of current debt:</strong> combined principal near <strong data-debt-combined-potential>$271,365,000</strong> before further paydowns (illustrative: current published debt + full $112M authorization).</li>
+          </ul>
+        </div>
+
+        <p class="debt-disclaimer">
+          <strong>Campaign transparency tool — not an official district publication.</strong>
+          Published principal and levy rates ($1.358 total; bond fund $0.358) are from the BPS Sept.&nbsp;8, 2025
+          budget hearing packet. Live interest uses an estimate: 2025–26 bond fund tax asking ($11,074,216) minus
+          scheduled principal ($4,610,000) ≈ <strong>$6,464,216/year (~$0.20/sec, ~4.06%)</strong>. That is a campaign
+          estimate of interest cost, not a district-published continuous rate. Homeowner examples use taxable valuation,
+          which can differ from market list price.
+          Bond facts: <a href="https://benningtonschools.org/219770_2" target="_blank" rel="noopener">district 2025 bond page</a>
+          and board materials. Update <code>js/debt-clock.js</code> when official figures change.
+        </p>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container" style="max-width: 720px;">
+        <span class="eyebrow">Why this matters</span>
+        <h2>How we borrow is a choice about the next twenty years</h2>
+        <p>
+          Bond financing can fund real needs—classrooms, capacity, and safe facilities—as Bennington grows.
+          It also commits taxpayers for decades. Board members should talk through clear tradeoffs, realistic
+          enrollment and cost projections, and spending that puts students in the classroom first.
+        </p>
+        <ul class="checklist">
+          <li>Know the difference between voter authorization and bonds <span class="nowrap">actually issued</span></li>
+          <li>Track principal paydown, interest, and levy impact in <span class="nowrap">plain language</span></li>
+          <li>Balance growth with fiscal restraint and <span class="nowrap">classroom priorities</span></li>
+        </ul>
+        <p style="margin-top: 1.5rem;">
+          <a class="btn btn-primary" href="index.html#pay-as-we-grow">See fiscal priorities</a>
+          <a class="btn btn-secondary" href="contact.html" style="margin-left: 0.5rem;">Share your questions</a>
+        </p>
+      </div>
+    </section>
+
+    <section class="cta-band">
+      <div class="container">
+        <h2>Responsible stewardship starts with transparency</h2>
+        <p>If you care about how Bennington invests for students and taxpayers, I’d like to hear from you.</p>
+        <div class="cta-actions">
+          <a class="btn btn-light" href="get-involved.html">Get involved</a>
+          <a class="btn btn-outline-light" href="contact.html">Contact me</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <div class="footer-brand">Chris Faucher</div>
+          <p>Candidate for Bennington Public Schools Board of Education · Bennington, Nebraska</p>
+        </div>
+        <div>
+          <h3>Explore</h3>
+          <ul class="footer-links">
+            <li><a href="about.html">About</a></li>
+            <li><a href="debt-clock.html">Debt Clock</a></li>
+            <li><a href="get-involved.html">Get Involved</a></li>
+            <li><a href="contact.html">Contact</a></li>
+          </ul>
+        </div>
+        <div>
+          <h3>Stay in touch</h3>
+          <ul class="footer-links">
+            <li><a href="mailto:info@chris4bps.com">info@chris4bps.com</a></li>
+            <li><a href="tel:+14022503000">(402) 250-3000</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span class="paid-for">Paid for by Chris Faucher</span>
+        <span>© <span id="year"></span> · Bennington, NE</span>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    document.getElementById("year").textContent = new Date().getFullYear();
+  </script>
+  <script src="js/main.js"></script>
+  <script src="js/debt-clock.js"></script>
+</body>
+</html>

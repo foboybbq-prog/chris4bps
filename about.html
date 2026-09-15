@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>About Chris Faucher | Bennington School Board</title>
+  <meta name="description" content="Learn about Chris Faucher, candidate for Bennington Public Schools Board of Education." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;700&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/styles.css" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="container nav-bar">
+      <a class="brand" href="index.html">
+        <span class="brand-name">Chris Faucher</span>
+        <span class="brand-tag">Bennington School Board</span>
+      </a>
+      <button class="nav-toggle" type="button" aria-label="Open menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+      <ul class="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="about.html" aria-current="page">About</a></li>
+        <li><a href="debt-clock.html">Debt Clock</a></li>
+        <li><a href="get-involved.html">Get Involved</a></li>
+        <li class="nav-cta"><a class="btn btn-primary" href="contact.html">Contact</a></li>
+      </ul>
+    </div>
+  </header>
+
+  <main>
+    <section class="section section-alt">
+      <div class="container split">
+        <div>
+          <span class="eyebrow">About the candidate</span>
+          <h1>Meet Chris Faucher</h1>
+          <p class="text-muted" style="font-size: 1.15rem;">
+            Neighbor, parent, and grandparent. Candidate for Bennington <span class="nowrap">School Board</span>.
+          </p>
+          <p>
+            I have lived in Bennington with my wife since the fall of 2006. We raised a BPS graduate, and we have
+            two grandchildren who will soon be ready for school. Off the clock I’m happiest in the kitchen or
+            barbecuing with family and friends.
+          </p>
+        </div>
+        <div>
+          <figure class="candidate-photo">
+            <img src="assets/candidate.jpg?v=navy" alt="Chris Faucher, candidate for Bennington School Board" width="800" height="1000" />
+          </figure>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <div class="section-header">
+          <span class="eyebrow">Background</span>
+          <h2>Experience that informs <span class="nowrap">my service</span></h2>
+          <p>Local roots, professional skills, and hands-on involvement in our schools and community.</p>
+        </div>
+        <div class="card-grid">
+          <article class="card">
+            <h3>Community &amp; family</h3>
+            <ul class="checklist">
+              <li>Lived in Bennington with my wife since fall 2006 <span class="nowrap">(20+ years)</span></li>
+              <li>Parent of a BPS graduate; grandparent of two children soon ready <span class="nowrap">for school</span></li>
+              <li>Volunteer on the Bennington Library expansion <span class="nowrap">remodel campaign</span></li>
+            </ul>
+          </article>
+          <article class="card">
+            <h3>Work &amp; skills</h3>
+            <ul class="checklist">
+              <li>IT analyst, currently with <span class="nowrap">Nebraska Medicine</span></li>
+              <li>Background in data engineering and technical support for <span class="nowrap">Nebraska organizations</span></li>
+              <li>Experience with budgeting, operations, and <span class="nowrap">technical training</span></li>
+            </ul>
+          </article>
+          <article class="card">
+            <h3>Education involvement</h3>
+            <ul class="checklist">
+              <li>Attended and watched BPS Board of Education meetings to <span class="nowrap">stay informed</span></li>
+              <li>Former school cafeteria worker at <span class="nowrap">Omaha Public Schools</span></li>
+              <li>Parent perspective from a full BPS student journey <span class="nowrap">through graduation</span></li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="cta-band">
+      <div class="container">
+        <h2>Questions about my background?</h2>
+        <p>I’m happy to talk with neighbors about my experience and why I’m running.</p>
+        <div class="cta-actions">
+          <a class="btn btn-light" href="contact.html">Contact me</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <div class="footer-brand">Chris Faucher</div>
+          <p>Candidate for Bennington Public Schools Board of Education · Bennington, Nebraska</p>
+        </div>
+        <div>
+          <h3>Explore</h3>
+          <ul class="footer-links">
+            <li><a href="about.html">About</a></li>
+            <li><a href="debt-clock.html">Debt Clock</a></li>
+            <li><a href="get-involved.html">Get Involved</a></li>
+            <li><a href="contact.html">Contact</a></li>
+          </ul>
+        </div>
+        <div>
+          <h3>Stay in touch</h3>
+          <ul class="footer-links">
+            <li><a href="mailto:info@chris4bps.com">info@chris4bps.com</a></li>
+            <li><a href="tel:+14022503000">(402) 250-3000</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span class="paid-for">Paid for by Chris Faucher</span>
+        <span>© <span id="year"></span> · Bennington, NE</span>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    document.getElementById("year").textContent = new Date().getFullYear();
+  </script>
+  <script src="js/main.js"></script>
+</body>
+</html>
