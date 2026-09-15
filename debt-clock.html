@@ -43,37 +43,35 @@
           </p>
         </div>
 
-        <div class="debt-clock-pair" role="group" aria-label="Side-by-side debt clocks">
+        <div class="debt-clock-pair" role="group" aria-label="Current outstanding debt and HS#2 authorization">
           <!-- Left: current published debt -->
           <div class="debt-clock-panel" role="region" aria-label="Current debt clock">
             <p class="debt-clock-badge">Current debt</p>
             <p class="debt-label">Principal + interest since as-of date</p>
-            <p class="debt-amount" data-debt-amount>$159,365,000</p>
+            <p class="debt-amount" data-debt-amount>$198,575,000</p>
             <p class="debt-rate debt-rate-live">
               <span data-interest-per-second>~$0.20 / sec</span>
               · interest (est.)
             </p>
             <p class="debt-note">
-              Published principal <strong data-debt-base-principal>$159,365,000</strong>
-              as of <strong data-debt-as-of>September 8, 2025</strong>, plus estimated interest
+              Published principal <strong data-debt-base-principal>$198,575,000</strong>
+              as of <strong data-debt-as-of>September 2026</strong>, plus estimated interest
               (<strong data-interest-accrued>$0</strong>). Whole dollars.
             </p>
           </div>
 
-          <!-- Right: current + future authorized HS#2 bond -->
-          <div class="debt-clock-panel debt-clock-panel-future" role="region" aria-label="Current plus future debt clock">
-            <p class="debt-clock-badge debt-clock-badge-future">Current + future debt</p>
-            <p class="debt-label">Adds full $112M HS#2 authorization</p>
-            <p class="debt-amount" data-debt-amount-with-future>$271,365,000</p>
-            <p class="debt-rate debt-rate-live">
-              <span data-interest-per-second-with-future>~$0.35 / sec</span>
-              · interest (est.)
+          <!-- Right: HS#2 authorization context (not stacked on outstanding) -->
+          <div class="debt-clock-panel debt-clock-panel-future" role="region" aria-label="HS#2 bond authorization">
+            <p class="debt-clock-badge debt-clock-badge-future">HS#2 authorization</p>
+            <p class="debt-label">2025 bond — not added again on top</p>
+            <p class="debt-amount" data-future-bond-total>$112,000,000</p>
+            <p class="debt-rate">
+              Authorized / issued context
             </p>
             <p class="debt-note">
-              Principal <strong data-debt-combined-principal>$271,365,000</strong>
-              (current + <strong data-future-bond-total>$112,000,000</strong> authorized),
-              plus estimated interest at the same ~<span data-interest-rate>4.06%</span> rate
-              (<strong data-interest-accrued-with-future>$0</strong>). Illustrative — full $112M not all issued yet.
+              Voter-authorized 2025 HS#2 bond. Issued amounts are already included in the
+              <strong data-debt-base-principal>$198,575,000</strong> outstanding principal
+              from the September 2026 presentation—not added again on top.
             </p>
           </div>
         </div>
@@ -81,20 +79,20 @@
         <div class="debt-stats debt-stats-shared">
           <div class="debt-stat">
             <strong data-interest-per-second>~$0.20 / sec</strong>
-            <span>Current-debt interest/sec (~<span data-interest-rate>4.06%</span> on published principal)</span>
+            <span>Current-debt interest/sec (~<span data-interest-rate>3.20%</span> on published principal)</span>
           </div>
           <div class="debt-stat">
-            <strong data-interest-annual>$6,464,216</strong>
+            <strong data-interest-annual>$6,350,431</strong>
             <span>Est. annual interest on current debt (bond tax asking − principal)</span>
           </div>
           <div class="debt-stat">
-            <strong data-interest-per-second-with-future>~$0.35 / sec</strong>
-            <span>With +$112M: same rate on combined principal (~<span data-interest-annual-with-future>$11.0M</span>/yr)</span>
+            <strong data-future-bond-total>$112,000,000</strong>
+            <span>HS#2 2025 authorization (issued amounts already in outstanding; not added again)</span>
           </div>
         </div>
         <p class="debt-pair-source">
-          Source: <span data-debt-source>BPS Board of Education Budget Hearing presentation (2025–26 budget)</span>.
-          Right clock is a campaign illustration if the full authorized HS#2 bond is outstanding on top of current debt.
+          Source: <span data-debt-source>BPS Board of Education Budget Hearing Presentation (September 2026)</span>.
+          The $112M HS#2 authorization is shown for context. Issued portions are already included in the September 2026 outstanding principal.
         </p>
 
         <!-- Current levy & homeowner impact -->
@@ -178,15 +176,16 @@
             <li><strong>Purpose:</strong> Second high school at 180th Street &amp; Military Road (capacity 1,000 expandable to 1,500).</li>
             <li><strong>Repayment:</strong> District materials described a ~21-year repayment schedule for the package.</li>
             <li><strong>Construction:</strong> Guaranteed Maximum Price with Hausmann Construction approved Nov. 2025 (~$98.4M construction GMP, per district newsletter).</li>
-            <li><strong>If fully issued on top of current debt:</strong> combined principal near <strong data-debt-combined-potential>$271,365,000</strong> before further paydowns (illustrative: current published debt + full $112M authorization).</li>
+            <li><strong>Outstanding vs. authorization:</strong> The September 2026 outstanding principal (<strong data-debt-base-principal>$198,575,000</strong>) is current debt. The $112M 2025 HS#2 bond is authorized/issued context—not added again on top of that figure.</li>
           </ul>
         </div>
 
         <p class="debt-disclaimer">
           <strong>Campaign transparency tool — not an official district publication.</strong>
-          Published principal and levy rates ($1.358 total; bond fund $0.358) are from the BPS Sept.&nbsp;8, 2025
-          budget hearing packet. Live interest uses an estimate: 2025–26 bond fund tax asking ($11,074,216) minus
-          scheduled principal ($4,610,000) ≈ <strong>$6,464,216/year (~$0.20/sec, ~4.06%)</strong>. That is a campaign
+          Published principal is from the BPS September 2026 Budget Hearing Presentation.
+          Levy rates ($1.358 total; bond fund $0.358) are from the 2025–26 budget hearing materials.
+          Live interest uses an estimate: bond fund tax asking ($12,115,431) minus
+          scheduled principal ($5,765,000) ≈ <strong>$6,350,431/year (~$0.20/sec, ~3.20%)</strong>. That is a campaign
           estimate of interest cost, not a district-published continuous rate. Homeowner examples use taxable valuation,
           which can differ from market list price.
           Bond facts: <a href="https://benningtonschools.org/219770_2" target="_blank" rel="noopener">district 2025 bond page</a>

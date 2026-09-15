@@ -1,38 +1,38 @@
 /**
  * Bennington Public Schools debt clock — figures from public district sources.
  *
- * LEFT CLOCK (current debt):
- *   $159,365,000 principal (Sept 8, 2025) + estimated interest since as-of date
+ * PRIMARY CLOCK (current outstanding):
+ *   $198,575,000 principal (September 2026 Budget Hearing Presentation)
+ *   + estimated interest since as-of date
  *
- * RIGHT CLOCK (current + future authorized HS#2 bond):
- *   Same method, but principal = $159,365,000 + $112,000,000
- *   Interest uses the same effective rate (~4.06%) scaled to the larger principal
+ * HS#2 AUTHORIZATION (context only — not added on top):
+ *   $112,000,000 voter-authorized 2025 bond. Issued amounts are already
+ *   reflected in the September 2026 outstanding principal.
  *
- * INTEREST ESTIMATE:
- *   Bond fund tax asking − scheduled principal = $6,464,216/year on current principal
- *   ≈ $0.20/sec at ~4.06% effective rate
+ * INTEREST ESTIMATE (same method as before; Sep 2026 deck inputs):
+ *   Bond fund tax asking − principal paid this year = $6,350,431/year
  */
 (function () {
   // --- CURRENT OUTSTANDING PRINCIPAL (published) ---
-  const BASE_PRINCIPAL = 159365000;
-  const BASE_DATE = new Date("2025-09-08T18:00:00-05:00"); // budget hearing evening (Central)
-  const CURRENT_AS_OF_LABEL = "September 8, 2025";
+  const BASE_PRINCIPAL = 198575000;
+  const BASE_DATE = new Date("2026-09-01T18:00:00-05:00");
+  const CURRENT_AS_OF_LABEL = "September 2026";
   const CURRENT_SOURCE =
-    "BPS Board of Education Budget Hearing presentation (2025–26 budget)";
+    "BPS Board of Education Budget Hearing Presentation (September 2026)";
 
   // Scheduled principal (from same presentation)
   const PRINCIPAL_NEXT_5_YEARS = 29140000;
-  const PRINCIPAL_FY_2025_26 = 4610000;
+  const PRINCIPAL_PAID_THIS_YEAR = 5765000;
 
   // --- INTEREST (derived from current debt budget figures) ---
-  const BOND_FUND_TAX_ASKING = 11074216;
-  const ANNUAL_INTEREST_EST = BOND_FUND_TAX_ASKING - PRINCIPAL_FY_2025_26; // 6,464,216
+  const BOND_FUND_TAX_ASKING = 12115431;
+  const ANNUAL_INTEREST_EST = BOND_FUND_TAX_ASKING - PRINCIPAL_PAID_THIS_YEAR; // 6,350,431
   const SECONDS_PER_YEAR = 365.25 * 24 * 60 * 60; // 31,557,600
   const INTEREST_PER_SECOND = ANNUAL_INTEREST_EST / SECONDS_PER_YEAR;
   const EFFECTIVE_RATE =
-    (ANNUAL_INTEREST_EST / BASE_PRINCIPAL) * 100; // ~4.06%
+    (ANNUAL_INTEREST_EST / BASE_PRINCIPAL) * 100; // ~3.20%
 
-  // --- FUTURE / AUTHORIZED HS#2 BOND ---
+  // --- FUTURE / AUTHORIZED HS#2 BOND (context; not stacked on outstanding) ---
   const FUTURE_BOND_TOTAL = 112000000;
   const FUTURE_BOND_APPROVED = "March 11, 2025";
   const FUTURE_BOARD_AUTH = "June 9, 2025";
@@ -43,14 +43,6 @@
   const FUTURE_FIRST_TRANCHE_WINDOW =
     "Series 2026 ~$55.5M expected; sale closing not confirmed in public records checked";
   const FUTURE_REMAINING_PLAN = FUTURE_BOND_TOTAL - FUTURE_FIRST_TRANCHE_PLAN;
-
-  // Combined principal for right-hand clock
-  const COMBINED_PRINCIPAL = BASE_PRINCIPAL + FUTURE_BOND_TOTAL;
-  // Scale interest to combined principal at the same effective rate
-  const ANNUAL_INTEREST_WITH_FUTURE =
-    ANNUAL_INTEREST_EST * (COMBINED_PRINCIPAL / BASE_PRINCIPAL);
-  const INTEREST_PER_SECOND_WITH_FUTURE =
-    ANNUAL_INTEREST_WITH_FUTURE / SECONDS_PER_YEAR;
 
   function formatMoney(amount, fractionDigits) {
     const digits = typeof fractionDigits === "number" ? fractionDigits : 0;
@@ -80,13 +72,10 @@
   function currentTotals() {
     const elapsed = secondsSinceBase();
     const interestCurrent = INTEREST_PER_SECOND * elapsed;
-    const interestWithFuture = INTEREST_PER_SECOND_WITH_FUTURE * elapsed;
     return {
       elapsed: elapsed,
       interestCurrent: interestCurrent,
       liveCurrent: BASE_PRINCIPAL + interestCurrent,
-      interestWithFuture: interestWithFuture,
-      liveWithFuture: COMBINED_PRINCIPAL + interestWithFuture,
     };
   }
 
@@ -94,19 +83,10 @@
     setText("[data-debt-as-of]", CURRENT_AS_OF_LABEL);
     setText("[data-debt-source]", CURRENT_SOURCE);
     setText("[data-debt-principal-5yr]", formatMoney(PRINCIPAL_NEXT_5_YEARS));
-    setText("[data-debt-principal-2526]", formatMoney(PRINCIPAL_FY_2025_26));
+    setText("[data-debt-principal-paid]", formatMoney(PRINCIPAL_PAID_THIS_YEAR));
     setText("[data-debt-base-principal]", formatMoney(BASE_PRINCIPAL));
-    setText("[data-debt-combined-principal]", formatMoney(COMBINED_PRINCIPAL));
     setText("[data-interest-annual]", formatMoney(ANNUAL_INTEREST_EST));
-    setText(
-      "[data-interest-annual-with-future]",
-      formatMoney(Math.round(ANNUAL_INTEREST_WITH_FUTURE))
-    );
     setText("[data-interest-per-second]", formatPerSecond(INTEREST_PER_SECOND));
-    setText(
-      "[data-interest-per-second-with-future]",
-      formatPerSecond(INTEREST_PER_SECOND_WITH_FUTURE)
-    );
     setText("[data-interest-rate]", EFFECTIVE_RATE.toFixed(2) + "%");
     setText("[data-bond-fund-tax]", formatMoney(BOND_FUND_TAX_ASKING));
 
@@ -119,36 +99,17 @@
     setText("[data-future-first-window]", FUTURE_FIRST_TRANCHE_WINDOW);
     setText("[data-future-board-auth]", FUTURE_BOARD_AUTH);
     setText("[data-future-remaining]", formatMoney(FUTURE_REMAINING_PLAN));
-    setText(
-      "[data-debt-combined-potential]",
-      formatMoney(COMBINED_PRINCIPAL)
-    );
   }
 
   function renderLive() {
     const t = currentTotals();
 
-    // Left: current debt only
     setText("[data-debt-amount]", formatMoney(Math.floor(t.liveCurrent), 0));
     setText(
       "[data-interest-accrued]",
       formatMoney(Math.floor(t.interestCurrent), 0)
     );
     setText("[data-interest-per-second]", formatPerSecond(INTEREST_PER_SECOND));
-
-    // Right: current + future authorized bond
-    setText(
-      "[data-debt-amount-with-future]",
-      formatMoney(Math.floor(t.liveWithFuture), 0)
-    );
-    setText(
-      "[data-interest-accrued-with-future]",
-      formatMoney(Math.floor(t.interestWithFuture), 0)
-    );
-    setText(
-      "[data-interest-per-second-with-future]",
-      formatPerSecond(INTEREST_PER_SECOND_WITH_FUTURE)
-    );
   }
 
   renderStatic();
