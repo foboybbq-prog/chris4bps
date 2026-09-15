@@ -165,6 +165,24 @@ p { margin: 0 0 1rem; }
   margin-left: 0.5rem;
 }
 
+/* Contact pill: .nav-links a is more specific than .btn-primary, so navy
+   link color was painting over the navy (--green / royal) fill (~1.05:1). */
+.nav-links .nav-cta a.btn,
+.nav-links .nav-cta a.btn:hover,
+.nav-links .nav-cta a.btn:focus-visible,
+.nav-links .nav-cta a.btn[aria-current="page"] {
+  color: var(--white);
+  background: var(--green);
+  border-bottom-color: transparent;
+}
+
+.nav-links .nav-cta a.btn:hover,
+.nav-links .nav-cta a.btn:focus-visible,
+.nav-links .nav-cta a.btn[aria-current="page"] {
+  background: var(--green-hover);
+  color: var(--white);
+}
+
 .nav-toggle {
   display: none;
   background: none;
@@ -1300,6 +1318,15 @@ p { margin: 0 0 1rem; }
 
   .nav-cta .btn {
     width: 100%;
+  }
+
+  /* Keep the navy pill + light label in the phone menu; do not inherit
+     the soft-blue highlight used on plain nav links. */
+  .nav-links .nav-cta a.btn:hover,
+  .nav-links .nav-cta a.btn:focus-visible,
+  .nav-links .nav-cta a.btn[aria-current="page"] {
+    background: var(--green-hover);
+    color: var(--white);
   }
 
   .priority-item {
