@@ -103,4 +103,15 @@
       form.reset();
     });
   });
+
+  if (!window.__bpsViewSent) {
+    window.__bpsViewSent = true;
+    var page = location.pathname || "/";
+    fetch("/api/view", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ page: page }),
+      keepalive: true,
+    }).catch(function () {});
+  }
 })();

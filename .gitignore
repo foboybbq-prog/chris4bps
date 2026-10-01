@@ -6,4 +6,6 @@ tmp-jan-min.pdf
 screen+time.jpg
 .DS_Store
 Thumbs.db
+data/
+node_modules/
 assets/candidate-flag-original.jpg
